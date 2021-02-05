@@ -1,6 +1,7 @@
 package main
 
 type NodeConfig struct {
+	ListenPort int `json:"listen_port"`
 }
 
 type LightNode struct {
