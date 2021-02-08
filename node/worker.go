@@ -1,10 +1,11 @@
-package main
+package node
 
 import (
 	"context"
 	"encoding/json"
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/didchain/didCard-go/account"
+	"github.com/didchain/didchain-lightnode-go/protocol"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -48,32 +49,32 @@ func (w *Worker)StopWebDaemon() {
 func ed25519Verify(w http.ResponseWriter,r *http.Request)  {
 	if r.Method != "POST"{
 		w.WriteHeader(500)
-		w.Write(ResponseError(ErrDesc[MethodNotCorrect],MethodNotCorrect).Bytes())
+		w.Write(protocol.ResponseError(protocol.ErrDesc[protocol.MethodNotCorrect], protocol.MethodNotCorrect).Bytes())
 		return
 	}
 
 	rbytes,err:=ioutil.ReadAll(r.Body)
 	if err!=nil{
 		w.WriteHeader(200)
-		w.Write(ResponseError(ErrDesc[InterIOErr],InterIOErr).Bytes())
+		w.Write(protocol.ResponseError(protocol.ErrDesc[protocol.InterIOErr], protocol.InterIOErr).Bytes())
 		return
 	}
 
-	vr:=&VerifyReq{}
+	vr:=&protocol.VerifyReq{}
 
-	req:=&Request{
+	req:=&protocol.Request{
 		PayLoad: vr,
 	}
 
 	if err:=json.Unmarshal(rbytes,req);err!=nil{
 		w.WriteHeader(200)
-		w.Write(ResponseError(ErrDesc[UnmarshalJsonErr],UnmarshalJsonErr).Bytes())
+		w.Write(protocol.ResponseError(protocol.ErrDesc[protocol.UnmarshalJsonErr], protocol.UnmarshalJsonErr).Bytes())
 		return
 	}
 
-	if req.Action != VerifySignature{
+	if req.Action != protocol.VerifySignature {
 		w.WriteHeader(200)
-		w.Write(ResponseError(ErrDesc[ActionErr],ActionErr).Bytes())
+		w.Write(protocol.ResponseError(protocol.ErrDesc[protocol.ActionErr], protocol.ActionErr).Bytes())
 		return
 	}
 
@@ -81,16 +82,11 @@ func ed25519Verify(w http.ResponseWriter,r *http.Request)  {
 
 	if b{
 		w.WriteHeader(200)
-		resp:=&VerifyResp{Signature: vr,
-			ResultCode: Sucess,
-			Result: true}
-		w.Write(ResponseSuccess(resp).Bytes())
+		resp:=&protocol.VerifyResp{Signature: vr}
+		w.Write(protocol.ResponseSuccess(resp).Bytes())
 	}else{
 		w.WriteHeader(200)
-		resp:=&VerifyResp{Signature: vr,
-			ResultCode: SignatureNotCorrect,
-			Result: false}
-		w.Write(ResponseSuccess(resp).Bytes())
+		w.Write(protocol.ResponseError(protocol.ErrDesc[protocol.SignatureNotCorrect], protocol.SignatureNotCorrect).Bytes())
 	}
 
 }

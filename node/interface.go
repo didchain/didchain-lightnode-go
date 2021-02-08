@@ -1,4 +1,4 @@
-package main
+package node
 
 import (
 	"encoding/json"
@@ -25,7 +25,7 @@ func LightNodeHome() string  {
 }
 
 func LightNodeConfFile()  string {
-	return path.Join(LightNodeHome(),lightNodeConfFile)
+	return path.Join(LightNodeHome(), lightNodeConfFile)
 }
 
 func InitNodeConf() *NodeConfig {
@@ -61,8 +61,8 @@ func (cfg *NodeConfig)Save()  {
 		os.MkdirAll(LightNodeHome(),0755)
 	}
 
-	if err:=tools.Save2File(j,LightNodeConfFile());err!=nil{
-		log.Println("save to ",LightNodeConfFile()," failed")
+	if err:=tools.Save2File(j, LightNodeConfFile());err!=nil{
+		log.Println("save to ", LightNodeConfFile()," failed")
 	}
 }
 

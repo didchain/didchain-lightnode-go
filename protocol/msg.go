@@ -1,4 +1,4 @@
-package main
+package protocol
 
 import "encoding/json"
 
@@ -18,12 +18,12 @@ const(
 
 var ErrDesc map[int]string =
 	map[int]string{
-		Sucess:"success",
-		MethodNotCorrect: "method not correct",
-		InterIOErr: "server read error",
-		UnmarshalJsonErr: "unmarshal json object error",
-		ActionErr: "action not correct",
-		SignatureNotCorrect:"signature not correct",
+		Sucess:              "success",
+		MethodNotCorrect:    "method not correct",
+		InterIOErr:          "server read error",
+		UnmarshalJsonErr:    "unmarshal json object error",
+		ActionErr:           "action not correct",
+		SignatureNotCorrect: "signature not correct",
 	    }
 
 
@@ -55,8 +55,6 @@ type VerifyReq struct {
 
 type VerifyResp struct {
 	Signature *VerifyReq `json:"signature"`
-	ResultCode int `json:"result_code"`
-	Result bool `json:"result"`
 }
 
 func (r *Response)String()  string{
@@ -64,11 +62,11 @@ func (r *Response)String()  string{
 }
 
 func (r *Response)Bytes() []byte  {
-	j,_:=json.Marshal(r)
+	j,_:=json.MarshalIndent(r," ","\t")
 	return j
 }
 
-func SimpleSuccessResponse() *Response  {
+func SimpleSuccessResponse() *Response {
 	 return &Response{Success: true}
 }
 
@@ -76,7 +74,7 @@ func ResponseSuccess(v interface{}) *Response {
 	return &Response{Success: true,PayLoad: v}
 }
 
-func ResponseError(errMsg string, errCode int) *Response  {
+func ResponseError(errMsg string, errCode int) *Response {
 	return &Response{ErrCode: errCode,ErrMsg: errMsg}
 }
 

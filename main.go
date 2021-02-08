@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/didchain/didchain-lightnode-go/node"
 	"log"
 	"os"
 	"os/signal"
@@ -12,9 +13,9 @@ var stop chan os.Signal
 
 func main() {
 
-	cfg:=InitNodeConf()
+	cfg:= node.InitNodeConf()
 
-	node:=NewNode(cfg)
+	node:= node.NewNode(cfg)
 
 	node.Start()
 
