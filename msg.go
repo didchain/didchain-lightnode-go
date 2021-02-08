@@ -1,16 +1,31 @@
 package main
 
+import "encoding/json"
+
 const(
 	VerifySignature int = iota
 )
 
 const(
 	Sucess int = iota
-	MethodNotCorrect
+	SignatureNotCorrect
 	InterIOErr
 	UnmarshalJsonErr
 	ActionErr
+	MethodNotCorrect
 )
+
+
+var ErrDesc map[int]string =
+	map[int]string{
+		Sucess:"success",
+		MethodNotCorrect: "method not correct",
+		InterIOErr: "server read error",
+		UnmarshalJsonErr: "unmarshal json object error",
+		ActionErr: "action not correct",
+		SignatureNotCorrect:"signature not correct",
+	    }
+
 
 type Request struct {
 	Action  int         `json:"action"`
@@ -24,16 +39,44 @@ type Response struct {
 	PayLoad interface{}   `json:"payload"`
 }
 
-type VerifyReq struct {
+
+type VerfiyPlainMsg struct {
 	DID       string `json:"did"` ///public key in string
-	Signature string `json:"sig"` ///hex string
 	TimeStamp int64 `json:"time_stamp"`
 	Latitude float64 `json:"latitude"`
 	Longitude float64 `json:"longitude"`
 }
+
+type VerifyReq struct {
+	Signature string `json:"sig"` ///hex string
+	VerfiyPlainMsg
+}
+
 
 type VerifyResp struct {
 	Signature *VerifyReq `json:"signature"`
 	ResultCode int `json:"result_code"`
 	Result bool `json:"result"`
 }
+
+func (r *Response)String()  string{
+	return string(r.Bytes())
+}
+
+func (r *Response)Bytes() []byte  {
+	j,_:=json.Marshal(r)
+	return j
+}
+
+func SimpleSuccessResponse() *Response  {
+	 return &Response{Success: true}
+}
+
+func ResponseSuccess(v interface{}) *Response {
+	return &Response{Success: true,PayLoad: v}
+}
+
+func ResponseError(errMsg string, errCode int) *Response  {
+	return &Response{ErrCode: errCode,ErrMsg: errMsg}
+}
+

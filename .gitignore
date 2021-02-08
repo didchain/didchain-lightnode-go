@@ -17,3 +17,5 @@
 /.idea/didchain-lightnode-go.iml
 /.idea/modules.xml
 /.idea/vcs.xml
+
+did-lightnode.*

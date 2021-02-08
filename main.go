@@ -1,56 +1,37 @@
 package main
 
 import (
-	"crypto/rand"
-	"encoding/base64"
-	"encoding/json"
-	"fmt"
-	"github.com/kprc/nbsnetwork/tools"
+	"log"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
-type HomeEntranceSignature struct {
 
-	Signature string `json:"signature"`
-	DID string `json:"did"`
-}
-
-type HomeEntranceSignatureResult struct {
-	Signature *HomeEntranceSignature `json:"signature"`
-	ResultCode int `json:"result_code"`
-	Result bool `json:"result"`
-}
-
+var stop chan os.Signal
 
 func main() {
-	//cfg := NodeConfig{}
-	//node := NewNode(cfg)
-	//
-	//node.Start()
 
-	//TODO wait user signal
+	cfg:=InitNodeConf()
 
-	sig:=make([]byte,33)
-	rand.Read(sig)
+	node:=NewNode(cfg)
 
-	did:=make([]byte,48)
-	rand.Read(did)
+	node.Start()
 
-	hes:=&HomeEntranceSignature{
-		TimeStamp: tools.GetNowMsTime(),
-		Latitude: 22.223344,
-		Longitude: 44.223322,
-		Signature: base64.StdEncoding.EncodeToString(sig),
-		DID: base64.StdEncoding.EncodeToString(did),
-	}
+	signal.Notify(stop,
+		syscall.SIGKILL,
+		syscall.SIGINT,
+		syscall.SIGTERM,
+		syscall.SIGQUIT)
 
-	hesr:=&HomeEntranceSignatureResult{
-		Signature: hes,
-		Result: true,
-		ResultCode: 0,
-	}
+	s:=<-stop
 
-	j,_:=json.MarshalIndent(hesr," ","\t")
+	log.Println("get signal:",s)
 
-	fmt.Println(string(j))
+	node.Stop()
 
+}
+
+func init()  {
+	stop = make(chan os.Signal,8)
 }
