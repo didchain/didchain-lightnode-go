@@ -25,7 +25,7 @@ func (w *Worker)StartWebDaemon() {
 
 	mux.HandleFunc("/ed25519/signatureVerify", ed25519Verify)
 
-	addr := "127.0.0.1:" + strconv.Itoa(w.port)
+	addr := "0.0.0.0:" + strconv.Itoa(w.port)
 
 	log.Println("Web Server Start at", addr)
 

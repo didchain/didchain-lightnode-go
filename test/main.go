@@ -2,6 +2,7 @@ package main
 
 import (
 	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"github.com/btcsuite/btcutil/base58"
@@ -13,6 +14,38 @@ func main()  {
 	//testinterface()
 
 
+	testloadwallet()
+
+}
+
+func testloadwallet()  {
+	//w,_:=account.NewWallet("123")
+
+	//fmt.Println("-----",hex.EncodeToString(w.PrivKey()))
+	wp:="/Users/rickeyliao/gowork/src/github.com/didchain/didchain-lightnode-go/test/testwallet"
+	//w.SaveToPath(wp)
+
+	//fmt.Println(w.String())
+
+	//w.Close()
+
+	wl,err:=account.LoadWallet(wp)
+	if err!=nil{
+		panic(err.Error())
+	}
+	fmt.Println(wl.String())
+
+	err = wl.Open("123")
+	if err!=nil{
+		panic(err.Error())
+	}
+
+	fmt.Println(hex.EncodeToString(wl.PrivKey()))
+
+	fmt.Println("open wallet success")
+}
+
+func testverifysig()  {
 	w,_:=account.NewWallet("123")
 	did := w.Did()
 
@@ -41,10 +74,10 @@ func main()  {
 	fmt.Println(string(j))
 
 	b:=account.VerifySig(did,sig,vr)
-	
-	fmt.Println(b)
 
+	fmt.Println(b)
 }
+
 
 func testinterface()  {
 	req:=&protocol.Request{Action: protocol.VerifySignature}
