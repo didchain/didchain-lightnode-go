@@ -2,6 +2,7 @@ package node
 
 import (
 	"context"
+	"github.com/didchain/didchain-lightnode-go/config"
 	"github.com/didchain/didchain-lightnode-go/user/storage"
 	"github.com/didchain/didchain-lightnode-go/user/webapi"
 	"log"
@@ -15,13 +16,14 @@ type Worker struct {
 	port int
 	webserver *http.Server
 	storage *storage.Storage
+	admin *config.AdminUser
 }
 
 
 func (w *Worker)StartWebDaemon() {
 	mux := http.NewServeMux()
 
-	userapi:=webapi.NewUserAPI(w.storage)
+	userapi:=webapi.NewUserAPI(w.storage,w.admin)
 
 	mux.HandleFunc("/ed25519/signatureVerify", userapi.Ed25519Verify)
 	mux.HandleFunc("/api/user/add",userapi.AddUser)
@@ -30,7 +32,7 @@ func (w *Worker)StartWebDaemon() {
 	mux.HandleFunc("/api/user/listUser",userapi.ListUser)
 	mux.HandleFunc("/api/user/listUser4Add",userapi.ListUnAuthorizeUser)
 	mux.HandleFunc("/api/auth/token",webapi.AccessToken)
-	mux.HandleFunc("api/auth/verify",webapi.SigVerify)
+	mux.HandleFunc("api/auth/verify",userapi.SigVerify)
 
 	addr := "0.0.0.0:" + strconv.Itoa(w.port)
 

@@ -5,6 +5,7 @@ import (
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/didchain/didCard-go/account"
 	"github.com/didchain/didchain-lightnode-go/protocol"
+	"github.com/kprc/nbsnetwork/tools"
 	"io/ioutil"
 	"net/http"
 )
@@ -48,6 +49,8 @@ func (ua *UserAPI)Ed25519Verify(w http.ResponseWriter,r *http.Request)  {
 		resp:=&protocol.VerifyResp{Signature: vr}
 		w.Write(protocol.ResponseSuccess(resp).Bytes())
 	}else{
+		glist4add.add(vr.DID,tools.GetNowMsTime())
+
 		w.WriteHeader(200)
 		w.Write(protocol.ResponseError(protocol.ErrDesc[protocol.SignatureNotCorrect], protocol.SignatureNotCorrect).Bytes())
 	}

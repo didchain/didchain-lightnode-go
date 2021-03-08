@@ -36,9 +36,9 @@ type ValidSigResult struct {
 	AccessToken string `json:"access_token"`
 }
 
-func SigVerify(w http.ResponseWriter, r *http.Request) {
+func (ua *UserAPI)SigVerify(w http.ResponseWriter, r *http.Request) {
 
-	vsr := doSigVerify(r)
+	vsr := ua.doSigVerify(r)
 
 	j, _ := json.Marshal(*vsr)
 
@@ -47,7 +47,7 @@ func SigVerify(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func doSigVerify(r *http.Request) *ValidSigResult {
+func (ua *UserAPI)doSigVerify(r *http.Request) *ValidSigResult {
 	vsr := &ValidSigResult{}
 
 	if r.Method != "POST" {
@@ -96,7 +96,7 @@ func doSigVerify(r *http.Request) *ValidSigResult {
 		//	vsr.ResultCode = 2
 		//	vsr.Message = "signature not correct"
 		//}
-		if !verify(to, as.Sig) {
+		if !ua.verify(to, as.Sig) {
 			vsr.ResultCode = 2
 			vsr.Message = "signature not correct"
 		}
@@ -112,7 +112,8 @@ func doSigVerify(r *http.Request) *ValidSigResult {
 	return vsr
 }
 
-func verify(message string, sigstr string) bool {
+func (ua *UserAPI)verify(message string, sigstr string) bool {
+
 	hash := crypto.Keccak256([]byte(message))
 	sig := base58.Decode(sigstr)
 	idx := len(sig) - 1
@@ -131,13 +132,15 @@ func verify(message string, sigstr string) bool {
 	recoveredAddr := crypto.PubkeyToAddress(*pubKey)
 	raddr := recoveredAddr.String()
 
-	var addrs []string
+	addrs:=ua.admin.ListUser()
 
 	for _, addr := range addrs {
 		if raddr == addr {
 			return true
 		}
 	}
+
+
 
 	return false
 

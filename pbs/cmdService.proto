@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package pbs;
+option go_package = ".;pbs";
+
+service CmdService {
+    rpc ShowAllAdminUser (EmptyRequest) returns (CommonResponse) {}
+    rpc ChgUser (AccessAddress) returns (CommonResponse) {}
+}
+
+message EmptyRequest {
+
+}
+
+
+
+message CommonResponse {
+    string msg = 1;
+}
+
+
+
+message AccessAddress{
+    string Adddr = 1;
+    int32  op = 2;
+}
+
+
+

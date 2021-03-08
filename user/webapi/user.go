@@ -2,6 +2,7 @@ package webapi
 
 import (
 	"encoding/json"
+	"github.com/didchain/didchain-lightnode-go/config"
 	"github.com/didchain/didchain-lightnode-go/user/storage"
 	"net/http"
 	"sync"
@@ -9,6 +10,7 @@ import (
 
 type UserAPI struct {
 	sdb *storage.Storage
+	admin *config.AdminUser
 }
 
 type ListItem struct {
@@ -39,7 +41,7 @@ func (lu *ListUser4Add)add(did string, t int64)  {
 }
 
 
-func NewUserAPI(sdb *storage.Storage) *UserAPI  {
+func NewUserAPI(sdb *storage.Storage,admin *config.AdminUser) *UserAPI  {
 	return &UserAPI{sdb: sdb}
 }
 
