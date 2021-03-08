@@ -2,7 +2,6 @@ package main
 
 import (
 	"crypto/rand"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"github.com/btcsuite/btcutil/base58"
@@ -18,31 +17,66 @@ func main()  {
 
 }
 
+
+func SignMessage(did string, latitude, longitude float64, timestamp int64) string  {
+	msg:= struct {
+		DID       string `json:"did"` ///public key in string
+		TimeStamp int64 `json:"time_stamp"`
+		Latitude float64 `json:"latitude"`
+		Longitude float64 `json:"longitude"`
+	}{}
+
+	msg.DID = did
+	msg.TimeStamp = timestamp
+	msg.Latitude = latitude
+	msg.Longitude = longitude
+
+	j,_:=json.Marshal(msg)
+
+	return string(j)
+
+}
+
 func testloadwallet()  {
-	//w,_:=account.NewWallet("123")
+	////w,_:=account.NewWallet("123")
+	//
+	////fmt.Println("-----",hex.EncodeToString(w.PrivKey()))
+	//wp:="/Users/rickeyliao/gowork/src/github.com/didchain/didchain-lightnode-go/test/testwallet"
+	////w.SaveToPath(wp)
+	//
+	////fmt.Println(w.String())
+	//
+	////w.Close()
+	//
+	//wl,err:=account.LoadWallet(wp)
+	//if err!=nil{
+	//	panic(err.Error())
+	//}
+	//fmt.Println(wl.String())
+	//
+	//
+	//
+	//err = wl.Open("123")
+	//if err!=nil{
+	//	panic(err.Error())
+	//}
+	//
+	//fmt.Println(hex.EncodeToString(wl.PrivKey()))
+	//
+	//fmt.Println("open wallet success")
+	//
+	//aesk,_:=wl.DriveAESKey("123")
+	//
+	//
+	//wl.Close()
+	//
+	//wl.OpenWithAesKey(aesk)
+	//
+	//fmt.Println(hex.EncodeToString(wl.PrivKey()))
 
-	//fmt.Println("-----",hex.EncodeToString(w.PrivKey()))
-	wp:="/Users/rickeyliao/gowork/src/github.com/didchain/didchain-lightnode-go/test/testwallet"
-	//w.SaveToPath(wp)
 
-	//fmt.Println(w.String())
+	fmt.Println(SignMessage("didaaa",11,12,11234343))
 
-	//w.Close()
-
-	wl,err:=account.LoadWallet(wp)
-	if err!=nil{
-		panic(err.Error())
-	}
-	fmt.Println(wl.String())
-
-	err = wl.Open("123")
-	if err!=nil{
-		panic(err.Error())
-	}
-
-	fmt.Println(hex.EncodeToString(wl.PrivKey()))
-
-	fmt.Println("open wallet success")
 }
 
 func testverifysig()  {

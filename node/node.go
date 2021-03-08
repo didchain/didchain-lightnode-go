@@ -2,16 +2,23 @@ package node
 
 import (
 	"encoding/json"
+	"github.com/btcsuite/goleveldb/leveldb"
+	"github.com/btcsuite/goleveldb/leveldb/filter"
+	"github.com/btcsuite/goleveldb/leveldb/opt"
+	"github.com/didchain/didchain-lightnode-go/user/storage"
 	"github.com/kprc/nbsnetwork/tools"
+
 	"log"
 	"os"
 	"path"
 )
 
 const lightNodeConfFile = "did-conf-file.json"
+const leveldbDir = "db"
 
 type NodeConfig struct {
 	ListenPort int `json:"listen_port"`
+	DatabasePath string `json:"database_path"`
 }
 
 type LightNode struct {
@@ -27,6 +34,7 @@ func LightNodeHome() string  {
 func LightNodeConfFile()  string {
 	return path.Join(LightNodeHome(), lightNodeConfFile)
 }
+
 
 func InitNodeConf() *NodeConfig {
 
@@ -46,6 +54,7 @@ func InitNodeConf() *NodeConfig {
 	}else{
 		cfg = &NodeConfig{
 			ListenPort: 50999,
+			DatabasePath: path.Join(LightNodeHome(),leveldbDir),
 		}
 
 		cfg.Save()
@@ -66,11 +75,28 @@ func (cfg *NodeConfig)Save()  {
 	}
 }
 
+
+
 func NewNode(cfg *NodeConfig) *LightNode {
+
+	//if !tools.FileExists(cfg.DatabasePath){
+	//	os.MkdirAll(cfg.DatabasePath,0755)
+	//}
+
+	opts := opt.Options{
+		Strict:      opt.DefaultStrict,
+		Compression: opt.NoCompression,
+		Filter:      filter.NewBloomFilter(10),
+	}
+
+	db, err := leveldb.OpenFile(cfg.DatabasePath, &opts)
+	if err != nil {
+		panic(err)
+	}
 
 	node := &LightNode{
 		conf:cfg,
-		worker: &Worker{port: cfg.ListenPort},
+		worker: &Worker{port: cfg.ListenPort,storage: storage.NewStorage(db)},
 	}
 
 	return node

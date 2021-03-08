@@ -2,11 +2,8 @@ package node
 
 import (
 	"context"
-	"encoding/json"
-	"github.com/btcsuite/btcutil/base58"
-	"github.com/didchain/didCard-go/account"
-	"github.com/didchain/didchain-lightnode-go/protocol"
-	"io/ioutil"
+	"github.com/didchain/didchain-lightnode-go/user/storage"
+	"github.com/didchain/didchain-lightnode-go/user/webapi"
 	"log"
 	"net/http"
 	"strconv"
@@ -17,13 +14,23 @@ import (
 type Worker struct {
 	port int
 	webserver *http.Server
+	storage *storage.Storage
 }
 
 
 func (w *Worker)StartWebDaemon() {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/ed25519/signatureVerify", ed25519Verify)
+	userapi:=webapi.NewUserAPI(w.storage)
+
+	mux.HandleFunc("/ed25519/signatureVerify", userapi.Ed25519Verify)
+	mux.HandleFunc("/api/user/add",userapi.AddUser)
+	mux.HandleFunc("/api/user/del",userapi.DelUser)
+	mux.HandleFunc("/api/user/count",userapi.UserCount)
+	mux.HandleFunc("/api/user/listUser",userapi.ListUser)
+	mux.HandleFunc("/api/user/listUser4Add",userapi.ListUnAuthorizeUser)
+	mux.HandleFunc("/api/auth/token",webapi.AccessToken)
+	mux.HandleFunc("api/auth/verify",webapi.SigVerify)
 
 	addr := "0.0.0.0:" + strconv.Itoa(w.port)
 
@@ -44,49 +51,4 @@ func (w *Worker)StopWebDaemon() {
 	w.webserver = nil
 
 	log.Println("Web Server Stopped")
-}
-
-func ed25519Verify(w http.ResponseWriter,r *http.Request)  {
-	if r.Method != "POST"{
-		w.WriteHeader(500)
-		w.Write(protocol.ResponseError(protocol.ErrDesc[protocol.MethodNotCorrect], protocol.MethodNotCorrect).Bytes())
-		return
-	}
-
-	rbytes,err:=ioutil.ReadAll(r.Body)
-	if err!=nil{
-		w.WriteHeader(200)
-		w.Write(protocol.ResponseError(protocol.ErrDesc[protocol.InterIOErr], protocol.InterIOErr).Bytes())
-		return
-	}
-
-	vr:=&protocol.VerifyReq{}
-
-	req:=&protocol.Request{
-		PayLoad: vr,
-	}
-
-	if err:=json.Unmarshal(rbytes,req);err!=nil{
-		w.WriteHeader(200)
-		w.Write(protocol.ResponseError(protocol.ErrDesc[protocol.UnmarshalJsonErr], protocol.UnmarshalJsonErr).Bytes())
-		return
-	}
-
-	if req.Action != protocol.VerifySignature {
-		w.WriteHeader(200)
-		w.Write(protocol.ResponseError(protocol.ErrDesc[protocol.ActionErr], protocol.ActionErr).Bytes())
-		return
-	}
-
-	b:=account.VerifySig(account.ID(vr.DID),base58.Decode(vr.Signature),vr.VerfiyPlainMsg)
-
-	if b{
-		w.WriteHeader(200)
-		resp:=&protocol.VerifyResp{Signature: vr}
-		w.Write(protocol.ResponseSuccess(resp).Bytes())
-	}else{
-		w.WriteHeader(200)
-		w.Write(protocol.ResponseError(protocol.ErrDesc[protocol.SignatureNotCorrect], protocol.SignatureNotCorrect).Bytes())
-	}
-
 }
