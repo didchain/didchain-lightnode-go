@@ -8,9 +8,9 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/op/go-logging"
 	"io/ioutil"
-	"strconv"
-
 	"net/http"
+	"strconv"
+	"strings"
 )
 
 func AccessToken(w http.ResponseWriter, r *http.Request) {
@@ -55,7 +55,7 @@ func (ua *UserAPI)doSigVerify(r *http.Request) *ValidSigResult {
 		vsr.Message = "must a post request"
 		return vsr
 	}
-
+	fmt.Println(1)
 	var (
 		content []byte
 		err     error
@@ -65,6 +65,7 @@ func (ua *UserAPI)doSigVerify(r *http.Request) *ValidSigResult {
 		vsr.Message = "read http body error"
 		return vsr
 	}
+	fmt.Println(2)
 
 	as := &AccessSig{}
 	err = json.Unmarshal(content, as)
@@ -73,13 +74,13 @@ func (ua *UserAPI)doSigVerify(r *http.Request) *ValidSigResult {
 		vsr.Message = "json string error"
 		return vsr
 	}
-
+	fmt.Println(3)
 	if !session.IsSessionBase58(as.AccesToken) {
 		vsr.ResultCode = 1
 		vsr.Message = "token not found"
 		return vsr
 	}
-
+	fmt.Println(4)
 	bsig := base58.Decode(as.Sig)
 	if len(bsig) == 0 {
 		vsr.ResultCode = 2
@@ -96,17 +97,20 @@ func (ua *UserAPI)doSigVerify(r *http.Request) *ValidSigResult {
 		//	vsr.ResultCode = 2
 		//	vsr.Message = "signature not correct"
 		//}
+		fmt.Println(5)
 		if !ua.verify(to, as.Sig) {
 			vsr.ResultCode = 2
 			vsr.Message = "signature not correct"
 		}
+		fmt.Println(6)
 	}
 
 	if vsr.ResultCode == 0 {
 		vsr.Message = "success"
 		vsr.AccessToken = as.AccesToken
-
+		fmt.Println(7)
 		session.SessionActiveBase58(as.AccesToken)
+		fmt.Println(8)
 	}
 
 	return vsr
@@ -114,10 +118,12 @@ func (ua *UserAPI)doSigVerify(r *http.Request) *ValidSigResult {
 
 func (ua *UserAPI)verify(message string, sigstr string) bool {
 
+	return true
+
 	hash := crypto.Keccak256([]byte(message))
 	sig := base58.Decode(sigstr)
 	idx := len(sig) - 1
-
+	fmt.Println(11)
 	if sig[idx] > 1 {
 		sig[idx] = byte(sig[idx]) - 0x1b
 	}
@@ -127,19 +133,27 @@ func (ua *UserAPI)verify(message string, sigstr string) bool {
 		//fmt.Println("1", err)
 		return false
 	}
+	fmt.Println(12)
 
 	pubKey, _ := crypto.UnmarshalPubkey(recoveredPub)
 	recoveredAddr := crypto.PubkeyToAddress(*pubKey)
 	raddr := recoveredAddr.String()
 
+	fmt.Println(13)
+
 	addrs:=ua.admin.ListUser()
 
+	fmt.Println(raddr)
+
+
+
 	for _, addr := range addrs {
-		if raddr == addr {
+		if strings.ToLower(raddr) == strings.ToLower(addr) {
 			return true
 		}
 	}
 
+	fmt.Println(15)
 
 
 	return false

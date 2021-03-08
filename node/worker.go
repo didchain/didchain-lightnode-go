@@ -32,7 +32,7 @@ func (w *Worker)StartWebDaemon() {
 	mux.HandleFunc("/api/user/listUser",userapi.ListUser)
 	mux.HandleFunc("/api/user/listUser4Add",userapi.ListUnAuthorizeUser)
 	mux.HandleFunc("/api/auth/token",webapi.AccessToken)
-	mux.HandleFunc("api/auth/verify",userapi.SigVerify)
+	mux.HandleFunc("/api/auth/verify",userapi.SigVerify)
 
 	addr := "0.0.0.0:" + strconv.Itoa(w.port)
 

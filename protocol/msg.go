@@ -13,6 +13,7 @@ const(
 	UnmarshalJsonErr
 	ActionErr
 	MethodNotCorrect
+	UserNotAuthorized
 )
 
 

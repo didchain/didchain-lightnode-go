@@ -42,7 +42,7 @@ func (lu *ListUser4Add)add(did string, t int64)  {
 
 
 func NewUserAPI(sdb *storage.Storage,admin *config.AdminUser) *UserAPI  {
-	return &UserAPI{sdb: sdb}
+	return &UserAPI{sdb: sdb,admin: admin}
 }
 
 type UserDesc struct {

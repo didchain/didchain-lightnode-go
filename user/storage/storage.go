@@ -59,6 +59,19 @@ func (s *Storage)DelUser(did string)   {
 	}
 }
 
+func (s *Storage)FindUser(did string) string {
+
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
+	v,err:=s.db.Get([]byte(didUserKey(did)),nil)
+	if err!=nil{
+		return ""
+	}
+
+	return string(v)
+}
+
 func (s *Storage)ListAll() []string  {
 	s.lock.RLock()
 	defer s.lock.RUnlock()

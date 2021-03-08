@@ -2,8 +2,7 @@ package session
 
 import (
 	"github.com/btcsuite/btcutil/base58"
-	"github.com/hyperorchidlab/go-miner-pool/util"
-	"github.com/hyperorchidlab/go-miner-pool/webserver/constant"
+	"github.com/kprc/nbsnetwork/tools"
 	"math/rand"
 	"sync"
 	"time"
@@ -14,31 +13,35 @@ type SessionDesc struct {
 	LastAccessTime int64
 }
 
+const (
+	RandBytesCount int = 16
+)
+
 var (
 	sessionTimeout int = 600 //10 minutes
 	quit           chan struct{}
 	wg             sync.WaitGroup
-	accessSession  map[[constant.RandBytesCount]byte]*SessionDesc
+	accessSession  map[[RandBytesCount]byte]*SessionDesc
 )
 
 func init() {
 	quit = make(chan struct{})
-	accessSession = make(map[[constant.RandBytesCount]byte]*SessionDesc)
+	accessSession = make(map[[RandBytesCount]byte]*SessionDesc)
 }
 
-func NewSession() ([constant.RandBytesCount]byte, *SessionDesc) {
-	var randbytes [constant.RandBytesCount]byte
+func NewSession() ([RandBytesCount]byte, *SessionDesc) {
+	var randbytes [RandBytesCount]byte
 
 	for {
-		rand.Seed(util.GetNowMsTime())
+		rand.Seed(tools.GetNowMsTime())
 		n, err := rand.Read(randbytes[:])
-		if err != nil || constant.RandBytesCount != n {
+		if err != nil || RandBytesCount != n {
 			continue
 		}
 		break
 	}
 
-	sd := &SessionDesc{LastAccessTime: util.GetNowMsTime()}
+	sd := &SessionDesc{LastAccessTime: tools.GetNowMsTime()}
 
 	accessSession[randbytes] = sd
 
@@ -52,7 +55,7 @@ func NewSession2() (string, *SessionDesc) {
 	return base58.Encode(b[:]), s
 }
 
-func IsSession(k [constant.RandBytesCount]byte) bool {
+func IsSession(k [RandBytesCount]byte) bool {
 	if _, ok := accessSession[k]; !ok {
 		return false
 	}
@@ -63,17 +66,17 @@ func IsSession(k [constant.RandBytesCount]byte) bool {
 func IsSessionBase58(k string) bool {
 	kb := base58.Decode(k)
 
-	if len(kb) != constant.RandBytesCount {
+	if len(kb) != RandBytesCount {
 		return false
 	}
 
-	var key [constant.RandBytesCount]byte
+	var key [RandBytesCount]byte
 	copy(key[:], kb)
 
 	return IsSession(key)
 }
 
-func IsValid(k [constant.RandBytesCount]byte) bool {
+func IsValid(k [RandBytesCount]byte) bool {
 	if s, ok := accessSession[k]; !ok {
 		return false
 	} else {
@@ -81,9 +84,11 @@ func IsValid(k [constant.RandBytesCount]byte) bool {
 			return false
 		}
 
-		if util.GetNowMsTime()-s.LastAccessTime > (int64(sessionTimeout) * 1000) {
+		if tools.GetNowMsTime()-s.LastAccessTime > (int64(sessionTimeout) * 1000) {
 			return false
 		}
+
+		s.LastAccessTime = tools.GetNowMsTime()
 
 		return true
 	}
@@ -92,11 +97,11 @@ func IsValid(k [constant.RandBytesCount]byte) bool {
 func IsValidBase58(k string) bool {
 	kb := base58.Decode(k)
 
-	if len(kb) != constant.RandBytesCount {
+	if len(kb) != RandBytesCount {
 		return false
 	}
 
-	var key [constant.RandBytesCount]byte
+	var key [RandBytesCount]byte
 	copy(key[:], kb)
 
 	return IsValid(key)
@@ -105,18 +110,18 @@ func IsValidBase58(k string) bool {
 func SessionActiveBase58(k string) {
 	kb := base58.Decode(k)
 
-	if len(kb) != constant.RandBytesCount {
+	if len(kb) != RandBytesCount {
 		return
 	}
 
-	var key [constant.RandBytesCount]byte
+	var key [RandBytesCount]byte
 	copy(key[:], kb)
 
 	if v, ok := accessSession[key]; !ok {
 		return
 	} else {
 		v.IsVerify = true
-		v.LastAccessTime = util.GetNowMsTime()
+		v.LastAccessTime = tools.GetNowMsTime()
 	}
 
 }
@@ -133,9 +138,9 @@ func StartTimeOut() {
 
 		}
 
-		now := util.GetNowMsTime()
+		now := tools.GetNowMsTime()
 
-		var ks [][constant.RandBytesCount]byte
+		var ks [][RandBytesCount]byte
 		for k, v := range accessSession {
 			if now-v.LastAccessTime > (int64(sessionTimeout) * 1000) {
 				ks = append(ks, k)

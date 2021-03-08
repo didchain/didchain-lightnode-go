@@ -45,11 +45,22 @@ func (ua *UserAPI)Ed25519Verify(w http.ResponseWriter,r *http.Request)  {
 	b:=account.VerifySig(account.ID(vr.DID),base58.Decode(vr.Signature),vr.VerfiyPlainMsg)
 
 	if b{
+
+		if v:=ua.sdb.FindUser(vr.DID);v==""{
+			glist4add.add(vr.DID,tools.GetNowMsTime())
+			w.WriteHeader(200)
+			w.Write(protocol.ResponseError(protocol.ErrDesc[protocol.UserNotAuthorized], protocol.UserNotAuthorized).Bytes())
+			return
+		}
+
 		w.WriteHeader(200)
 		resp:=&protocol.VerifyResp{Signature: vr}
 		w.Write(protocol.ResponseSuccess(resp).Bytes())
+
+
+
 	}else{
-		glist4add.add(vr.DID,tools.GetNowMsTime())
+
 
 		w.WriteHeader(200)
 		w.Write(protocol.ResponseError(protocol.ErrDesc[protocol.SignatureNotCorrect], protocol.SignatureNotCorrect).Bytes())

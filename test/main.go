@@ -7,14 +7,389 @@ import (
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/didchain/didCard-go/account"
 	"github.com/didchain/didchain-lightnode-go/protocol"
+	"github.com/ethereum/go-ethereum/crypto"
+	act2 "github.com/hyperorchidlab/go-miner-pool/account"
+	"github.com/kprc/nbsnetwork/tools"
+	"github.com/kprc/nbsnetwork/tools/httputil"
+	"io/ioutil"
+	"net/http"
+	"strconv"
 )
 
 func main()  {
+
+
+
 	//testinterface()
 
 
-	testloadwallet()
+	//testloadwallet()
 
+	testw1,_:=account.NewWallet("123")
+	fmt.Println(testw1.Did().String())
+
+
+	testw1,_=account.NewWallet("123")
+	fmt.Println(testw1.Did().String())
+
+
+	testw1,_=account.NewWallet("123")
+	fmt.Println(testw1.Did().String())
+
+	testw1,_=account.NewWallet("123")
+	fmt.Println(testw1.Did().String())
+
+	testw1,_=account.NewWallet("123")
+	fmt.Println(testw1.Did().String())
+
+
+
+	accesstoken,err:=gettoken()
+	if err!=nil{
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Println(accesstoken)
+
+	var (
+		w act2.Wallet
+
+	)
+
+	walletfile:="/Users/rickeyliao/gowork/src/github.com/didchain/didchain-lightnode-go/test/testwallet2"
+
+	if tools.FileExists(walletfile){
+		w,_=act2.LoadWallet(walletfile)
+
+		w.Open("123")
+
+	}else{
+		w,_=act2.NewWallet("123")
+		w.SaveToPath(walletfile)
+	}
+
+	fmt.Println(w.MainAddress().String())
+
+	to := "\x19Ethereum Signed Message:\n"
+	to += strconv.Itoa(len(accesstoken))
+	to += accesstoken
+
+	hash := crypto.Keccak256([]byte(to))
+
+	sig,_:=w.Sign(hash)
+
+	verifysig(sig,accesstoken)
+
+	wp:="/Users/rickeyliao/gowork/src/github.com/didchain/didchain-lightnode-go/test/testwallet"
+	wl,err:=account.LoadWallet(wp)
+	if err!=nil{
+		panic(err.Error())
+	}
+	fmt.Println(wl.String())
+
+
+	err = wl.Open("123")
+	if err!=nil{
+		panic(err.Error())
+	}
+
+	//addUser(wl.Did().String(),accesstoken)
+	//delUser(wl.Did().String(),accesstoken)
+	countUser(accesstoken)
+	listUser(accesstoken)
+	listunauth(accesstoken)
+}
+
+
+
+func listUser(token string)  {
+	type UserReqParam struct {
+		PageSize     int  `json:"page_size"`
+		PageNum      int  `json:"page_num"`
+	}
+
+	type Request struct {
+		AccessToken string      `json:"access_token"`
+		Data        interface{} `json:"data,omitempty"`
+	}
+	urp:=&UserReqParam{
+		PageSize: 20,
+		PageNum: 0,
+	}
+
+	r:=&Request{
+		AccessToken: token,
+		Data: urp,
+	}
+
+	url:="http://39.99.198.143:50999/api/user/listUser"
+	j,_:=json.MarshalIndent(r," ","\t")
+	fmt.Println(url,"send to ",string(j))
+	resp,_,err:=httputil.Post(url,string(j),false)
+	if err!=nil{
+		fmt.Println(err)
+		return
+	}
+	type UserDesc struct {
+		Name string	`json:"name"`
+		UnitName string `json:"unit_name"`
+		SerialNumber string `json:"serial_number"`
+		Did string `json:"did"`
+	}
+	type UserListDetails struct {
+		PageSize     int  `json:"page_size"`
+		PageNum      int  `json:"page_num"`
+		Uds []*UserDesc   `json:"uds"`
+	}
+
+	uld := &UserListDetails{}
+
+	type Response struct {
+		ResultCode int         `json:"result_code"`
+		Message    string      `json:"message"`
+		Data       interface{} `json:"data,omitempty"`
+	}
+	res:=&Response{
+		Data: uld,
+	}
+
+	json.Unmarshal([]byte(resp),res)
+
+	fmt.Println("response",resp)
+
+}
+
+func listunauth(token string)  {
+	var b bool
+
+	type Request struct {
+		AccessToken string      `json:"access_token"`
+		Data        interface{} `json:"data,omitempty"`
+	}
+	r := &Request{
+		AccessToken: token,
+		Data: &b,
+	}
+
+
+	url:="http://39.99.198.143:50999/api/user/listUser4Add"
+	j,_:=json.MarshalIndent(r," ","\t")
+	fmt.Println(url,"send to ",string(j))
+	resp,_,err:=httputil.Post(url,string(j),false)
+	if err!=nil{
+		fmt.Println(err)
+		return
+	}
+
+	type ListItem struct {
+		Did string `json:"did"`
+		T int64 `json:"t"`
+	}
+
+	type ListUser4Add struct {
+		Dids []*ListItem `json:"dids"`
+	}
+
+	lua:=&ListUser4Add{}
+
+	type Response struct {
+		ResultCode int         `json:"result_code"`
+		Message    string      `json:"message"`
+		Data       interface{} `json:"data,omitempty"`
+	}
+	res:=&Response{
+		Data: lua,
+	}
+
+
+	json.Unmarshal([]byte(resp),res)
+
+	fmt.Println("response",resp)
+}
+
+
+func countUser(token string)  {
+	var b bool
+
+	type Request struct {
+		AccessToken string      `json:"access_token"`
+		Data        interface{} `json:"data,omitempty"`
+	}
+	r := &Request{
+		AccessToken: token,
+		Data: &b,
+	}
+
+
+	url:="http://39.99.198.143:50999/api/user/count"
+	j,_:=json.MarshalIndent(r," ","\t")
+	fmt.Println(url,"send to ",string(j))
+	resp,_,err:=httputil.Post(url,string(j),false)
+	if err!=nil{
+		fmt.Println(err)
+		return
+	}
+
+	var count int
+
+	type Response struct {
+		ResultCode int         `json:"result_code"`
+		Message    string      `json:"message"`
+		Data       interface{} `json:"data,omitempty"`
+	}
+	res:=&Response{
+		Data: &count,
+	}
+
+
+	json.Unmarshal([]byte(resp),res)
+
+	fmt.Println("response",resp)
+}
+
+func delUser(did string,token string)  {
+
+	type Request struct {
+		AccessToken string      `json:"access_token"`
+		Data        interface{} `json:"data,omitempty"`
+	}
+	r := &Request{
+		AccessToken: token,
+		Data: &did,
+	}
+
+
+	url:="http://39.99.198.143:50999/api/user/del"
+	j,_:=json.MarshalIndent(r," ","\t")
+	fmt.Println(url,"send to ",string(j))
+	resp,_,err:=httputil.Post(url,string(j),false)
+	if err!=nil{
+		fmt.Println(err)
+		return
+	}
+
+	type Response struct {
+		ResultCode int         `json:"result_code"`
+		Message    string      `json:"message"`
+		Data       interface{} `json:"data,omitempty"`
+	}
+	res:=&Response{}
+
+
+	json.Unmarshal([]byte(resp),res)
+
+	fmt.Println("response",resp)
+}
+
+
+func addUser(did string,token string)  {
+	type UserDesc struct {
+		Name string	`json:"name"`
+		UnitName string `json:"unit_name"`
+		SerialNumber string `json:"serial_number"`
+		Did string `json:"did"`
+	}
+
+	type Request struct {
+		AccessToken string      `json:"access_token"`
+		Data        interface{} `json:"data,omitempty"`
+	}
+
+	ud:=&UserDesc{
+		Name: "rickey",
+		UnitName: "unit 5",
+		SerialNumber: "112233",
+		Did: did,
+	}
+
+	r := &Request{
+		AccessToken: token,
+		Data: ud,
+	}
+
+	url:="http://39.99.198.143:50999/api/user/add"
+	j,_:=json.MarshalIndent(r," ","\t")
+
+	fmt.Println("send to ",string(j))
+
+	resp,_,err:=httputil.Post(url,string(j),false)
+	if err!=nil{
+		fmt.Println(err)
+		return
+	}
+
+	type Response struct {
+		ResultCode int         `json:"result_code"`
+		Message    string      `json:"message"`
+		Data       interface{} `json:"data,omitempty"`
+	}
+
+	res:=&Response{}
+
+
+	json.Unmarshal([]byte(resp),res)
+
+	fmt.Println("response",resp)
+
+}
+
+func verifysig(sig []byte, token string)  {
+	url:="http://39.99.198.143:50999/api/auth/verify"
+
+	type AccessSig struct {
+		Sig        string `json:"sig"`
+		AccesToken string `json:"acces_token"`
+	}
+
+	as:=&AccessSig{
+		Sig: base58.Encode(sig),
+		AccesToken: token,
+	}
+
+	j,_:=json.MarshalIndent(as," ","\t")
+
+	fmt.Println("send to ",string(j))
+
+	resp,_,err:=httputil.Post(url,string(j),false)
+	if err!=nil{
+		fmt.Println(err)
+		return
+	}
+
+	type ValidSigResult struct {
+		ResultCode  int    `json:"result_code"` //0 success, 1 session not found, 2 signature not correct, 3 other error
+		Message     string `json:"message"`
+		AccessToken string `json:"access_token"`
+	}
+
+	vr:=&ValidSigResult{}
+
+	json.Unmarshal([]byte(resp),vr)
+
+	fmt.Println("response",resp)
+
+}
+
+
+func gettoken() (string,error) {
+	url:="http://39.99.198.143:50999/api/auth/token"
+	fmt.Println(url,"get")
+	resp,err:=http.Get(url)
+	if err!=nil{
+		fmt.Println(err)
+		return "",err
+	}
+
+	r,e:=ioutil.ReadAll(resp.Body)
+	if e!=nil{
+		fmt.Println(e)
+		return "",e
+	}
+
+	//fmt.Println(string(r))
+
+	return string(r),nil
 }
 
 
