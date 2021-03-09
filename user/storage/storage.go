@@ -6,12 +6,13 @@ import (
 	"github.com/btcsuite/goleveldb/leveldb"
 	"github.com/btcsuite/goleveldb/leveldb/opt"
 	"github.com/btcsuite/goleveldb/leveldb/util"
+	"github.com/didchain/didCard-go/account"
 	"sync"
 )
 
 const(
 	UserHead string = "didchain_user_%s"
-	UserListBegin string = "didchain_user_did111111111111111111111111111111111"
+	UserListBegin string = "didchain_user_did"
 	UserListEnd   string = "didchain_user_didzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
 )
 
@@ -36,10 +37,18 @@ func (s *Storage)AddUser(did string, v interface{}) error {
 
 	j,_:=json.Marshal(v)
 
+
+	fmt.Println("add user",string(j))
+
+	if _,err:=account.ConvertToID(did);err!=nil{
+		return err
+	}
+
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
 	if err:=s.db.Put([]byte(didUserKey(did)),j,wo);err!=nil{
+		fmt.Println("add user",err)
 		return err
 	}
 
@@ -53,6 +62,8 @@ func (s *Storage)DelUser(did string)   {
 
 	s.lock.Lock()
 	defer s.lock.Unlock()
+
+	fmt.Println("delete user",did)
 
 	if err:=s.db.Delete([]byte(didUserKey(did)),wo);err!=nil{
 		fmt.Println("Storage delete",did,"failed")
@@ -69,6 +80,8 @@ func (s *Storage)FindUser(did string) string {
 		return ""
 	}
 
+	fmt.Println("find user",string(v))
+
 	return string(v)
 }
 
@@ -83,6 +96,7 @@ func (s *Storage)ListAll() []string  {
 	var vs []string
 
 	for iter.Next(){
+		fmt.Println("listall",string(iter.Key()))
 		vs = append(vs,string(iter.Value()))
 	}
 
@@ -120,16 +134,23 @@ func (s *Storage)ListAllValue2(convert func(data []byte) interface{}, begin, cou
 		cnt int
 	)
 
+	end:=begin+count
+
 	for iter.Next(){
-		if begin<=cnt{
+
+		fmt.Println("listall value2",iter.Key())
+
+		if cnt>=begin && cnt<end{
 			vs = append(vs,convert(iter.Value()))
 		}
 
-		if cnt - begin +1 > count{
+
+		cnt ++
+
+		if cnt >=end{
 			break
 		}
 
-		cnt ++
 
 	}
 

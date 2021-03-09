@@ -7,5 +7,6 @@ require (
 	github.com/didchain/didCard-go v0.0.0-20210301232341-9acb9246d7c7
 	github.com/kprc/nbsdht v0.0.0-20190523081012-710019eb9202 // indirect
 	github.com/kprc/nbsnetwork v0.0.0-20210202012125-391b06131ef9
+	github.com/op/go-logging v0.0.0-20160315200505-970db520ece7
 	github.com/pkg/errors v0.9.1 // indirect
 )

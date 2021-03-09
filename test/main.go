@@ -25,22 +25,22 @@ func main()  {
 
 	//testloadwallet()
 
-	testw1,_:=account.NewWallet("123")
-	fmt.Println(testw1.Did().String())
-
-
-	testw1,_=account.NewWallet("123")
-	fmt.Println(testw1.Did().String())
-
-
-	testw1,_=account.NewWallet("123")
-	fmt.Println(testw1.Did().String())
-
-	testw1,_=account.NewWallet("123")
-	fmt.Println(testw1.Did().String())
-
-	testw1,_=account.NewWallet("123")
-	fmt.Println(testw1.Did().String())
+	//testw1,_:=account.NewWallet("123")
+	//fmt.Println(testw1.Did().String())
+	//
+	//
+	//testw1,_=account.NewWallet("123")
+	//fmt.Println(testw1.Did().String())
+	//
+	//
+	//testw1,_=account.NewWallet("123")
+	//fmt.Println(testw1.Did().String())
+	//
+	//testw1,_=account.NewWallet("123")
+	//fmt.Println(testw1.Did().String())
+	//
+	//testw1,_=account.NewWallet("123")
+	//fmt.Println(testw1.Did().String())
 
 
 
@@ -57,7 +57,7 @@ func main()  {
 
 	)
 
-	walletfile:="/Users/rickeyliao/gowork/src/github.com/didchain/didchain-lightnode-go/test/testwallet2"
+	walletfile:="/Users/rickeyliao/gowork/src/github.com/didchain/didchain-lightnode-go/test/testwallet4"
 
 	if tools.FileExists(walletfile){
 		w,_=act2.LoadWallet(walletfile)
@@ -81,21 +81,23 @@ func main()  {
 
 	verifysig(sig,accesstoken)
 
-	wp:="/Users/rickeyliao/gowork/src/github.com/didchain/didchain-lightnode-go/test/testwallet"
-	wl,err:=account.LoadWallet(wp)
-	if err!=nil{
-		panic(err.Error())
+	var wl account.Wallet
+	wp:="/Users/rickeyliao/gowork/src/github.com/didchain/didchain-lightnode-go/test/tw2"
+	if tools.FileExists(wp){
+		wl,_=account.LoadWallet(wp)
+		fmt.Println(wl.String())
+
+
+		wl.Open("123")
+
+	}else{
+		wl,_=account.NewWallet("123")
+		wl.SaveToPath(wp)
 	}
-	fmt.Println(wl.String())
 
 
-	err = wl.Open("123")
-	if err!=nil{
-		panic(err.Error())
-	}
-
-	//addUser(wl.Did().String(),accesstoken)
-	//delUser(wl.Did().String(),accesstoken)
+	addUser(wl.Did().String(),accesstoken)
+	delUser(wl.Did().String(),accesstoken)
 	countUser(accesstoken)
 	listUser(accesstoken)
 	listunauth(accesstoken)

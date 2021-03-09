@@ -12,13 +12,19 @@ GOBUILD=CGO_ENABLED=0 go build -ldflags '-w -s'
 BINDIR=./bin
 NAME=did-lightnode
 
+resdir=./webpages
+
 all: lnx mac arm
 
-mac:
+
+staticfile:
+	go-bindata -o $(resdir)/webfs/webfs.go -pkg=webfs $(resdir)/html/dist/...
+
+mac: staticfile
 	GOOS=darwin go build -ldflags '-w -s' -o $(BINDIR)/$(NAME).mac
-arm:
+arm: staticfile
 	GOOS=linux GOARM=7 GOARCH=arm go build -ldflags '-w -s' -o $(BINDIR)/$(NAME).arm
-lnx:
+lnx: staticfile
 	GOOS=linux go build -ldflags '-w -s' -o $(BINDIR)/$(NAME).lnx
 
 clean:

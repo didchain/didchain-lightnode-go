@@ -8,12 +8,6 @@ import (
 )
 
 func (cs *cmdService)ShowAllAdminUser(ctx context.Context, r *pbs.EmptyRequest) (*pbs.CommonResponse, error)  {
-	//msg := node.SrvNode().UserManagement().ShowAllUser()
-	//
-	//return &pbs.CommonResponse{
-	//	Msg: msg,
-	//},
-	//nil
 
 	msg:="no user"
 

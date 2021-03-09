@@ -2,6 +2,7 @@ package webapi
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/didchain/didchain-lightnode-go/config"
 	"github.com/didchain/didchain-lightnode-go/user/storage"
 	"net/http"
@@ -32,13 +33,45 @@ func init()  {
 func (lu *ListUser4Add)add(did string, t int64)  {
 	glistlock.Lock()
 	defer glistlock.Unlock()
+
+	for i:=0;i<len(lu.Dids);i++{
+		if lu.Dids[i].Did == did{
+			fmt.Println("duplication add unauth",did)
+			return
+		}
+	}
+
 	lu.Dids = append(lu.Dids, &ListItem{Did: did,T: t})
+
+	fmt.Println("11111",lu.Dids)
+
 	l:=len(lu.Dids)
 	if  l> 3{
 		lu.Dids = lu.Dids[l-3:l]
 	}
+
+	fmt.Println("22222",lu.Dids)
 	return
 }
+
+func (lu *ListUser4Add)dup() *ListUser4Add  {
+	lua:=&ListUser4Add{}
+
+	glistlock.Lock()
+	defer glistlock.Unlock()
+
+	for i:=0;i<len(lu.Dids);i++{
+		item:=&ListItem{
+			Did: lu.Dids[i].Did,
+			T: lu.Dids[i].T,
+		}
+		lua.Dids = append(lua.Dids,item)
+	}
+
+	return lua
+
+}
+
 
 
 func NewUserAPI(sdb *storage.Storage,admin *config.AdminUser) *UserAPI  {
@@ -64,7 +97,11 @@ func (ua *UserAPI)AddUser(w http.ResponseWriter,r *http.Request){
 		return
 	}
 
-	ua.sdb.AddUser(ud.Did,&ud)
+	err:=ua.sdb.AddUser(ud.Did,&ud)
+	if err!=nil{
+		resp.ResultCode = 1
+		resp.Message = err.Error()
+	}
 	j, _ := json.Marshal(*resp)
 	w.WriteHeader(200)
 	w.Write(j)
@@ -122,6 +159,9 @@ func (ua *UserAPI)ListUser(w http.ResponseWriter,r *http.Request)  {
 		return ud
 	},param.PageNum*param.PageSize,param.PageSize)
 
+
+	fmt.Println("list user uapi",len(uas))
+
 	for i:=0;i<len(uas);i++{
 		data.Uds = append(data.Uds,uas[i].(*UserDesc))
 	}
@@ -143,7 +183,8 @@ func (ua *UserAPI)UserCount(w http.ResponseWriter,r *http.Request)   {
 		return
 	}
 
-	count:=len(ua.sdb.ListAll())
+	allusers:=ua.sdb.ListAll()
+	count:=len(allusers)
 
 	resp.Data =  &count
 
@@ -166,9 +207,8 @@ func (ua *UserAPI)ListUnAuthorizeUser(w http.ResponseWriter,r *http.Request)  {
 		w.Write(j)
 		return
 	}
-	glistlock.Lock()
-	defer glistlock.Unlock()
-	resp.Data = *glist4add
+
+	resp.Data = glist4add.dup()
 
 	j, _ := json.Marshal(*resp)
 	w.WriteHeader(200)

@@ -2,6 +2,7 @@ package webapi
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/didchain/didCard-go/account"
 	"github.com/didchain/didchain-lightnode-go/protocol"
@@ -47,7 +48,9 @@ func (ua *UserAPI)Ed25519Verify(w http.ResponseWriter,r *http.Request)  {
 	if b{
 
 		if v:=ua.sdb.FindUser(vr.DID);v==""{
+			fmt.Println("add to unauth..",vr.DID)
 			glist4add.add(vr.DID,tools.GetNowMsTime())
+
 			w.WriteHeader(200)
 			w.Write(protocol.ResponseError(protocol.ErrDesc[protocol.UserNotAuthorized], protocol.UserNotAuthorized).Bytes())
 			return
@@ -56,9 +59,6 @@ func (ua *UserAPI)Ed25519Verify(w http.ResponseWriter,r *http.Request)  {
 		w.WriteHeader(200)
 		resp:=&protocol.VerifyResp{Signature: vr}
 		w.Write(protocol.ResponseSuccess(resp).Bytes())
-
-
-
 	}else{
 
 

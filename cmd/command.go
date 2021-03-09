@@ -34,8 +34,8 @@ func init()  {
 	AdminUserCmd.AddCommand(AdminAddUserCmd)
 	AdminUserCmd.AddCommand(AdminDelUserCmd)
 
-	AdminAddUserCmd.Flags().StringVarP(&adminDid,"did","d","","did")
-	AdminDelUserCmd.Flags().StringVarP(&adminDid,"did","d","","did")
+	AdminAddUserCmd.Flags().StringVarP(&adminDid,"eth-address","a","","a eth address")
+	AdminDelUserCmd.Flags().StringVarP(&adminDid,"eth-address","a","","a eth address")
 
 }
 

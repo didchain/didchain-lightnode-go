@@ -5,6 +5,8 @@ import (
 	"github.com/didchain/didchain-lightnode-go/config"
 	"github.com/didchain/didchain-lightnode-go/user/storage"
 	"github.com/didchain/didchain-lightnode-go/user/webapi"
+	"github.com/didchain/didchain-lightnode-go/webpages/webfs"
+	assetfs "github.com/elazarl/go-bindata-assetfs"
 	"log"
 	"net/http"
 	"strconv"
@@ -33,6 +35,11 @@ func (w *Worker)StartWebDaemon() {
 	mux.HandleFunc("/api/user/listUser4Add",userapi.ListUnAuthorizeUser)
 	mux.HandleFunc("/api/auth/token",webapi.AccessToken)
 	mux.HandleFunc("/api/auth/verify",userapi.SigVerify)
+
+
+	wfs := assetfs.AssetFS{Asset: webfs.Asset, AssetDir: webfs.AssetDir, AssetInfo: webfs.AssetInfo, Prefix: "webpages/html/dist"}
+
+	mux.Handle("/", http.FileServer(&wfs))
 
 	addr := "0.0.0.0:" + strconv.Itoa(w.port)
 
