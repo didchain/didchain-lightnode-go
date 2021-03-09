@@ -3,6 +3,7 @@ package node
 import (
 	"context"
 	"github.com/didchain/didchain-lightnode-go/config"
+	"github.com/didchain/didchain-lightnode-go/user/session"
 	"github.com/didchain/didchain-lightnode-go/user/storage"
 	"github.com/didchain/didchain-lightnode-go/user/webapi"
 	"github.com/didchain/didchain-lightnode-go/webpages/webfs"
@@ -45,6 +46,8 @@ func (w *Worker) StartWebDaemon() {
 
 	w.webserver = &http.Server{Addr: addr, Handler: mux}
 
+	go session.StartTimeOut()
+
 	go log.Fatal(w.webserver.ListenAndServe())
 }
 
@@ -54,6 +57,8 @@ func (w *Worker) StopWebDaemon() {
 	}
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 	w.webserver.Shutdown(ctx)
+
+	session.StopTimeOut()
 
 	w.webserver = nil
 
