@@ -8,7 +8,7 @@ import (
 	"github.com/didchain/didCard-go/account"
 	"github.com/didchain/didchain-lightnode-go/protocol"
 	"github.com/ethereum/go-ethereum/crypto"
-	act2 "github.com/hyperorchidlab/go-miner-pool/account"
+	act2 "github.com/didchain/didchain-lightnode-go/test/account"
 	"github.com/kprc/nbsnetwork/tools"
 	"github.com/kprc/nbsnetwork/tools/httputil"
 	"io/ioutil"
