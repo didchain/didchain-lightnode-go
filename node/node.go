@@ -8,13 +8,10 @@ import (
 	"github.com/didchain/didchain-lightnode-go/user/storage"
 )
 
-
-
 type LightNode struct {
-	conf *config.NodeConfig
+	conf   *config.NodeConfig
 	worker *Worker
 }
-
 
 func NewNode(cfg *config.NodeConfig) *LightNode {
 
@@ -34,8 +31,8 @@ func NewNode(cfg *config.NodeConfig) *LightNode {
 	}
 
 	node := &LightNode{
-		conf:cfg,
-		worker: &Worker{port: cfg.ListenPort,storage: storage.NewStorage(db),
+		conf: cfg,
+		worker: &Worker{port: cfg.ListenPort, storage: storage.NewStorage(db),
 			admin: config.LoadAdminUser(cfg.AdminUserDb)},
 	}
 
@@ -46,6 +43,6 @@ func (sn *LightNode) Start() {
 	sn.worker.StartWebDaemon()
 }
 
-func (sn *LightNode) Stop()  {
+func (sn *LightNode) Stop() {
 	sn.worker.StopWebDaemon()
 }

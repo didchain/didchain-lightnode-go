@@ -26,24 +26,23 @@ func main() {
 	}
 }
 
-var param struct{
+var param struct {
 	version bool
-	did string
+	did     string
 }
-
 
 var stop chan os.Signal
 
 func mainRun(_ *cobra.Command, _ []string) {
 
-	if param.version{
+	if param.version {
 		fmt.Println("0.0.1")
 		return
 	}
 
-	cfg:= config.InitNodeConf()
+	cfg := config.InitNodeConf()
 
-	node:= node.NewNode(cfg)
+	node := node.NewNode(cfg)
 
 	go cmd.StartCmdService()
 
@@ -55,19 +54,19 @@ func mainRun(_ *cobra.Command, _ []string) {
 		syscall.SIGTERM,
 		syscall.SIGQUIT)
 
-	s:=<-stop
+	s := <-stop
 
-	log.Println("get signal:",s)
+	log.Println("get signal:", s)
 
 	node.Stop()
 
 }
 
-func init()  {
-	rootCmd.Flags().BoolVarP(&param.version,"version","v",false,"node version")
+func init() {
+	rootCmd.Flags().BoolVarP(&param.version, "version", "v", false, "node version")
 	rootCmd.AddCommand(cmd.AdminUserCmd)
 	//rootCmd.Flags().StringVarP(&param.did, "did",
 	//	"d", "", "admin user")
 
-	stop = make(chan os.Signal,8)
+	stop = make(chan os.Signal, 8)
 }

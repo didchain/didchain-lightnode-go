@@ -15,13 +15,13 @@ var AdminUserCmd = &cobra.Command{
 	Run:   showAllAdminUser,
 }
 
-var AdminAddUserCmd  = &cobra.Command{
+var AdminAddUserCmd = &cobra.Command{
 	Use:   "add",
 	Short: "add admin user",
 	Long:  `TODO::.`,
 	Run:   addAdminUser,
 }
-var AdminDelUserCmd  = &cobra.Command{
+var AdminDelUserCmd = &cobra.Command{
 	Use:   "del",
 	Short: "del admin user",
 	Long:  `TODO::.`,
@@ -30,12 +30,12 @@ var AdminDelUserCmd  = &cobra.Command{
 
 var adminDid string
 
-func init()  {
+func init() {
 	AdminUserCmd.AddCommand(AdminAddUserCmd)
 	AdminUserCmd.AddCommand(AdminDelUserCmd)
 
-	AdminAddUserCmd.Flags().StringVarP(&adminDid,"eth-address","a","","a eth address")
-	AdminDelUserCmd.Flags().StringVarP(&adminDid,"eth-address","a","","a eth address")
+	AdminAddUserCmd.Flags().StringVarP(&adminDid, "eth-address", "a", "", "a eth address")
+	AdminDelUserCmd.Flags().StringVarP(&adminDid, "eth-address", "a", "", "a eth address")
 
 }
 
@@ -50,12 +50,11 @@ func showAllAdminUser(_ *cobra.Command, _ []string) {
 	fmt.Println(msg.Msg)
 }
 
-
 func addAdminUser(_ *cobra.Command, _ []string) {
 	c := DialToCmdService()
 	msg, err := c.ChgUser(context.TODO(), &pbs.AccessAddress{
 		Adddr: adminDid,
-		Op: 1,
+		Op:    1,
 	})
 	if err != nil {
 		fmt.Println(err)
@@ -67,9 +66,9 @@ func addAdminUser(_ *cobra.Command, _ []string) {
 
 func delAdminUser(_ *cobra.Command, _ []string) {
 	c := DialToCmdService()
-	msg, err := c.ChgUser(context.TODO(),  &pbs.AccessAddress{
+	msg, err := c.ChgUser(context.TODO(), &pbs.AccessAddress{
 		Adddr: adminDid,
-		Op: 2,
+		Op:    2,
 	})
 	if err != nil {
 		fmt.Println(err)

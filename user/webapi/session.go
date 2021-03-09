@@ -20,10 +20,7 @@ func AccessToken(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "%s", base58.Encode(randbytes[:]))
 }
 
-
-
 var logger, _ = logging.GetLogger("webserver")
-
 
 type AccessSig struct {
 	Sig        string `json:"sig"`
@@ -36,7 +33,7 @@ type ValidSigResult struct {
 	AccessToken string `json:"access_token"`
 }
 
-func (ua *UserAPI)SigVerify(w http.ResponseWriter, r *http.Request) {
+func (ua *UserAPI) SigVerify(w http.ResponseWriter, r *http.Request) {
 
 	vsr := ua.doSigVerify(r)
 
@@ -47,7 +44,7 @@ func (ua *UserAPI)SigVerify(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (ua *UserAPI)doSigVerify(r *http.Request) *ValidSigResult {
+func (ua *UserAPI) doSigVerify(r *http.Request) *ValidSigResult {
 	vsr := &ValidSigResult{}
 
 	if r.Method != "POST" {
@@ -116,7 +113,7 @@ func (ua *UserAPI)doSigVerify(r *http.Request) *ValidSigResult {
 	return vsr
 }
 
-func (ua *UserAPI)verify(message string, sigstr string) bool {
+func (ua *UserAPI) verify(message string, sigstr string) bool {
 
 	return true
 
@@ -141,11 +138,9 @@ func (ua *UserAPI)verify(message string, sigstr string) bool {
 
 	fmt.Println(13)
 
-	addrs:=ua.admin.ListUser()
+	addrs := ua.admin.ListUser()
 
 	fmt.Println(raddr)
-
-
 
 	for _, addr := range addrs {
 		if strings.ToLower(raddr) == strings.ToLower(addr) {
@@ -155,8 +150,6 @@ func (ua *UserAPI)verify(message string, sigstr string) bool {
 
 	fmt.Println(15)
 
-
 	return false
 
 }
-

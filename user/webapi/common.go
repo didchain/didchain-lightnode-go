@@ -65,4 +65,3 @@ func doRequest(r *http.Request, v interface{}) (*Request, *Response) {
 
 	return req, resp
 }
-

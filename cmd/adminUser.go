@@ -7,41 +7,41 @@ import (
 	"github.com/didchain/didchain-lightnode-go/pbs"
 )
 
-func (cs *cmdService)ShowAllAdminUser(ctx context.Context, r *pbs.EmptyRequest) (*pbs.CommonResponse, error)  {
+func (cs *cmdService) ShowAllAdminUser(ctx context.Context, r *pbs.EmptyRequest) (*pbs.CommonResponse, error) {
 
-	msg:="no user"
+	msg := "no user"
 
-	au:=config.GAdminUser
-	if au == nil{
+	au := config.GAdminUser
+	if au == nil {
 		msg = "load admin user failed"
-	}else{
-		s:=au.ListUser()
-		j,_:=json.MarshalIndent(s," ","\t")
+	} else {
+		s := au.ListUser()
+		j, _ := json.MarshalIndent(s, " ", "\t")
 		msg = string(j)
 	}
 
 	return &pbs.CommonResponse{
 		Msg: msg,
-	},nil
+	}, nil
 
 }
 
-func (cs *cmdService)ChgUser(ctx context.Context,r  *pbs.AccessAddress) (*pbs.CommonResponse, error)  {
-	msg:="success"
+func (cs *cmdService) ChgUser(ctx context.Context, r *pbs.AccessAddress) (*pbs.CommonResponse, error) {
+	msg := "success"
 
-	au:=config.GAdminUser
-	if au == nil{
+	au := config.GAdminUser
+	if au == nil {
 		msg = "load admin user failed"
-	}else{
-		if r.Op == 1{
+	} else {
+		if r.Op == 1 {
 			err := au.AddUser(r.Adddr)
-			if err!=nil{
+			if err != nil {
 				msg = err.Error()
 			}
-		}else{
-			if r.Op == 2{
-				err:=au.DelUser(r.Adddr)
-				if err!=nil{
+		} else {
+			if r.Op == 2 {
+				err := au.DelUser(r.Adddr)
+				if err != nil {
 					msg = err.Error()
 				}
 			}
@@ -51,6 +51,6 @@ func (cs *cmdService)ChgUser(ctx context.Context,r  *pbs.AccessAddress) (*pbs.Co
 
 	return &pbs.CommonResponse{
 		Msg: msg,
-	},nil
+	}, nil
 
 }

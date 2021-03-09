@@ -8,7 +8,6 @@ import (
 	"net"
 )
 
-
 type cmdService struct{}
 
 func StartCmdService() {

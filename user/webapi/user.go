@@ -10,13 +10,13 @@ import (
 )
 
 type UserAPI struct {
-	sdb *storage.Storage
+	sdb   *storage.Storage
 	admin *config.AdminUser
 }
 
 type ListItem struct {
 	Did string `json:"did"`
-	T int64 `json:"t"`
+	T   int64  `json:"t"`
 }
 
 type ListUser4Add struct {
@@ -26,70 +26,66 @@ type ListUser4Add struct {
 var glist4add *ListUser4Add
 var glistlock sync.Mutex
 
-func init()  {
+func init() {
 	glist4add = &ListUser4Add{}
 }
 
-func (lu *ListUser4Add)add(did string, t int64)  {
+func (lu *ListUser4Add) add(did string, t int64) {
 	glistlock.Lock()
 	defer glistlock.Unlock()
 
-	for i:=0;i<len(lu.Dids);i++{
-		if lu.Dids[i].Did == did{
-			fmt.Println("duplication add unauth",did)
+	for i := 0; i < len(lu.Dids); i++ {
+		if lu.Dids[i].Did == did {
+			fmt.Println("duplication add unauth", did)
 			return
 		}
 	}
 
-	lu.Dids = append(lu.Dids, &ListItem{Did: did,T: t})
+	lu.Dids = append(lu.Dids, &ListItem{Did: did, T: t})
 
-	fmt.Println("11111",lu.Dids)
+	fmt.Println("11111", lu.Dids)
 
-	l:=len(lu.Dids)
-	if  l> 3{
-		lu.Dids = lu.Dids[l-3:l]
+	l := len(lu.Dids)
+	if l > 3 {
+		lu.Dids = lu.Dids[l-3 : l]
 	}
 
-	fmt.Println("22222",lu.Dids)
+	fmt.Println("22222", lu.Dids)
 	return
 }
 
-func (lu *ListUser4Add)dup() *ListUser4Add  {
-	lua:=&ListUser4Add{}
+func (lu *ListUser4Add) dup() *ListUser4Add {
+	lua := &ListUser4Add{}
 
 	glistlock.Lock()
 	defer glistlock.Unlock()
 
-	for i:=0;i<len(lu.Dids);i++{
-		item:=&ListItem{
+	for i := 0; i < len(lu.Dids); i++ {
+		item := &ListItem{
 			Did: lu.Dids[i].Did,
-			T: lu.Dids[i].T,
+			T:   lu.Dids[i].T,
 		}
-		lua.Dids = append(lua.Dids,item)
+		lua.Dids = append(lua.Dids, item)
 	}
 
 	return lua
 
 }
 
-
-
-func NewUserAPI(sdb *storage.Storage,admin *config.AdminUser) *UserAPI  {
-	return &UserAPI{sdb: sdb,admin: admin}
+func NewUserAPI(sdb *storage.Storage, admin *config.AdminUser) *UserAPI {
+	return &UserAPI{sdb: sdb, admin: admin}
 }
 
 type UserDesc struct {
-	Name string	`json:"name"`
-	UnitName string `json:"unit_name"`
+	Name         string `json:"name"`
+	UnitName     string `json:"unit_name"`
 	SerialNumber string `json:"serial_number"`
-	Did string `json:"did"`
+	Did          string `json:"did"`
 }
 
-
-
-func (ua *UserAPI)AddUser(w http.ResponseWriter,r *http.Request){
+func (ua *UserAPI) AddUser(w http.ResponseWriter, r *http.Request) {
 	var ud UserDesc
-	 _,resp:=doRequest(r,&ud)
+	_, resp := doRequest(r, &ud)
 	if resp.ResultCode > 0 {
 		j, _ := json.Marshal(*resp)
 		w.WriteHeader(200)
@@ -97,8 +93,8 @@ func (ua *UserAPI)AddUser(w http.ResponseWriter,r *http.Request){
 		return
 	}
 
-	err:=ua.sdb.AddUser(ud.Did,&ud)
-	if err!=nil{
+	err := ua.sdb.AddUser(ud.Did, &ud)
+	if err != nil {
 		resp.ResultCode = 1
 		resp.Message = err.Error()
 	}
@@ -107,11 +103,9 @@ func (ua *UserAPI)AddUser(w http.ResponseWriter,r *http.Request){
 	w.Write(j)
 }
 
-
-
-func (ua *UserAPI)DelUser(w http.ResponseWriter,r *http.Request){
+func (ua *UserAPI) DelUser(w http.ResponseWriter, r *http.Request) {
 	var user string
-	_,resp:=doRequest(r,&user)
+	_, resp := doRequest(r, &user)
 	if resp.ResultCode > 0 {
 		j, _ := json.Marshal(*resp)
 		w.WriteHeader(200)
@@ -126,17 +120,17 @@ func (ua *UserAPI)DelUser(w http.ResponseWriter,r *http.Request){
 }
 
 type UserReqParam struct {
-	PageSize     int  `json:"page_size"`
-	PageNum      int  `json:"page_num"`
+	PageSize int `json:"page_size"`
+	PageNum  int `json:"page_num"`
 }
 
 type UserListDetails struct {
-	PageSize     int  `json:"page_size"`
-	PageNum      int  `json:"page_num"`
-	Uds []*UserDesc   `json:"uds"`
+	PageSize int         `json:"page_size"`
+	PageNum  int         `json:"page_num"`
+	Uds      []*UserDesc `json:"uds"`
 }
 
-func (ua *UserAPI)ListUser(w http.ResponseWriter,r *http.Request)  {
+func (ua *UserAPI) ListUser(w http.ResponseWriter, r *http.Request) {
 	mrp := &UserReqParam{}
 
 	req, resp := doRequest(r, mrp)
@@ -152,18 +146,16 @@ func (ua *UserAPI)ListUser(w http.ResponseWriter,r *http.Request)  {
 
 	resp.Data = data
 
-
-	uas:=ua.sdb.ListAllValue2(func(data []byte) interface{} {
+	uas := ua.sdb.ListAllValue2(func(data []byte) interface{} {
 		ud := &UserDesc{}
-		json.Unmarshal(data,ud)
+		json.Unmarshal(data, ud)
 		return ud
-	},param.PageNum*param.PageSize,param.PageSize)
+	}, param.PageNum*param.PageSize, param.PageSize)
 
+	fmt.Println("list user uapi", len(uas))
 
-	fmt.Println("list user uapi",len(uas))
-
-	for i:=0;i<len(uas);i++{
-		data.Uds = append(data.Uds,uas[i].(*UserDesc))
+	for i := 0; i < len(uas); i++ {
+		data.Uds = append(data.Uds, uas[i].(*UserDesc))
 	}
 
 	j, _ := json.Marshal(*resp)
@@ -173,7 +165,7 @@ func (ua *UserAPI)ListUser(w http.ResponseWriter,r *http.Request)  {
 
 }
 
-func (ua *UserAPI)UserCount(w http.ResponseWriter,r *http.Request)   {
+func (ua *UserAPI) UserCount(w http.ResponseWriter, r *http.Request) {
 	var forceRefresh bool
 	_, resp := doRequest(r, &forceRefresh)
 	if resp.ResultCode > 0 {
@@ -183,24 +175,21 @@ func (ua *UserAPI)UserCount(w http.ResponseWriter,r *http.Request)   {
 		return
 	}
 
-	allusers:=ua.sdb.ListAll()
-	count:=len(allusers)
+	allusers := ua.sdb.ListAll()
+	count := len(allusers)
 
-	resp.Data =  &count
+	resp.Data = &count
 
 	j, _ := json.Marshal(*resp)
 
 	w.WriteHeader(200)
 	w.Write(j)
 
-
 }
 
-
-
-func (ua *UserAPI)ListUnAuthorizeUser(w http.ResponseWriter,r *http.Request)  {
+func (ua *UserAPI) ListUnAuthorizeUser(w http.ResponseWriter, r *http.Request) {
 	var refresh bool
-	_,resp:=doRequest(r,&refresh)
+	_, resp := doRequest(r, &refresh)
 	if resp.ResultCode > 0 {
 		j, _ := json.Marshal(*resp)
 		w.WriteHeader(200)
@@ -215,4 +204,3 @@ func (ua *UserAPI)ListUnAuthorizeUser(w http.ResponseWriter,r *http.Request)  {
 	w.Write(j)
 
 }
-

@@ -14,45 +14,41 @@ import (
 const lightNodeConfFile = "did-conf-file.json"
 const leveldbDir = "db"
 
-
 type NodeConfig struct {
-	ListenPort int `json:"listen_port"`
+	ListenPort   int    `json:"listen_port"`
 	DatabasePath string `json:"database_path"`
-	AdminUserDb string `json:"admin_user_db"`
+	AdminUserDb  string `json:"admin_user_db"`
 }
 
-
-
-func LightNodeHome() string  {
-	home,_:=tools.Home()
-	return path.Join(home,".didHome")
+func LightNodeHome() string {
+	home, _ := tools.Home()
+	return path.Join(home, ".didHome")
 }
 
-func LightNodeConfFile()  string {
+func LightNodeConfFile() string {
 	return path.Join(LightNodeHome(), lightNodeConfFile)
 }
-
 
 func InitNodeConf() *NodeConfig {
 
 	var cfg *NodeConfig
 
 	cfgfile := LightNodeConfFile()
-	if tools.FileExists(cfgfile){
-		if data,err:=tools.OpenAndReadAll(cfgfile);err!=nil{
+	if tools.FileExists(cfgfile) {
+		if data, err := tools.OpenAndReadAll(cfgfile); err != nil {
 			panic(err.Error())
-		}else{
+		} else {
 			cfg = &NodeConfig{}
-			if err=json.Unmarshal(data,cfg);err!=nil{
+			if err = json.Unmarshal(data, cfg); err != nil {
 				panic(err.Error())
 			}
 		}
 
-	}else{
+	} else {
 		cfg = &NodeConfig{
-			ListenPort: 50999,
-			DatabasePath: path.Join(LightNodeHome(),leveldbDir),
-			AdminUserDb: path.Join(LightNodeHome(),"adminUser.db"),
+			ListenPort:   50999,
+			DatabasePath: path.Join(LightNodeHome(), leveldbDir),
+			AdminUserDb:  path.Join(LightNodeHome(), "adminUser.db"),
 		}
 
 		cfg.Save()
@@ -61,42 +57,40 @@ func InitNodeConf() *NodeConfig {
 	return cfg
 }
 
-func (cfg *NodeConfig)Save()  {
-	j,_:=json.MarshalIndent(*cfg," ","\t")
+func (cfg *NodeConfig) Save() {
+	j, _ := json.MarshalIndent(*cfg, " ", "\t")
 
-	if !tools.FileExists(LightNodeHome()){
-		os.MkdirAll(LightNodeHome(),0755)
+	if !tools.FileExists(LightNodeHome()) {
+		os.MkdirAll(LightNodeHome(), 0755)
 	}
 
-	if err:=tools.Save2File(j, LightNodeConfFile());err!=nil{
-		log.Println("save to ", LightNodeConfFile()," failed")
+	if err := tools.Save2File(j, LightNodeConfFile()); err != nil {
+		log.Println("save to ", LightNodeConfFile(), " failed")
 	}
 }
-
 
 type AdminUser struct {
-	Lock sync.Mutex
+	Lock     sync.Mutex
 	savePath string
-	EthAddr []string `json:"eth_addr"`
+	EthAddr  []string `json:"eth_addr"`
 }
-
 
 var GAdminUser *AdminUser
 
 func LoadAdminUser(adminfile string) *AdminUser {
 
-	au:=&AdminUser{savePath: adminfile}
-	if data,err:=tools.OpenAndReadAll(adminfile);err!=nil{
+	au := &AdminUser{savePath: adminfile}
+	if data, err := tools.OpenAndReadAll(adminfile); err != nil {
 		GAdminUser = au
 		return au
-	}else{
+	} else {
 		var addrs []string
-		if err=json.Unmarshal(data,&addrs);err!=nil{
+		if err = json.Unmarshal(data, &addrs); err != nil {
 			panic(err.Error())
 		}
 
-		for i:=0;i<len(addrs);i++{
-			au.EthAddr = append(au.EthAddr,addrs[i])
+		for i := 0; i < len(addrs); i++ {
+			au.EthAddr = append(au.EthAddr, addrs[i])
 		}
 
 		GAdminUser = au
@@ -105,53 +99,53 @@ func LoadAdminUser(adminfile string) *AdminUser {
 	}
 }
 
-func (au *AdminUser)Save()  {
-	addrs:=au.listUser()
+func (au *AdminUser) Save() {
+	addrs := au.listUser()
 
-	data,_:=json.MarshalIndent(addrs," ","\t")
-	tools.Save2File(data,au.savePath)
+	data, _ := json.MarshalIndent(addrs, " ", "\t")
+	tools.Save2File(data, au.savePath)
 }
 
-func (au *AdminUser)AddUser(id string) error  {
-	if b:=common.IsHexAddress(id);!b{
+func (au *AdminUser) AddUser(id string) error {
+	if b := common.IsHexAddress(id); !b {
 		return errors.New("not a correct eth address")
 	}
 
 	au.Lock.Lock()
 	defer au.Lock.Unlock()
 
-	for i:=0;i<len(au.EthAddr);i++{
-		if au.EthAddr[i] == id{
+	for i := 0; i < len(au.EthAddr); i++ {
+		if au.EthAddr[i] == id {
 			return errors.New("duplicate user")
 		}
 	}
 
-	au.EthAddr = append(au.EthAddr,id)
+	au.EthAddr = append(au.EthAddr, id)
 
 	au.Save()
 
 	return nil
 }
 
-func (au *AdminUser)DelUser(id string) error  {
-	if b:=common.IsHexAddress(id);!b{
+func (au *AdminUser) DelUser(id string) error {
+	if b := common.IsHexAddress(id); !b {
 		return errors.New("not a correct eth address")
 	}
 	au.Lock.Lock()
 	defer au.Lock.Unlock()
 
-	fordel:=-1
+	fordel := -1
 
-	for i:=0;i<len(au.EthAddr);i++{
-		if au.EthAddr[i] == id{
+	for i := 0; i < len(au.EthAddr); i++ {
+		if au.EthAddr[i] == id {
 			fordel = i
 		}
 	}
 
-	if fordel == -1{
+	if fordel == -1 {
 		return errors.New("no address in db")
 	}
-	l:=len(au.EthAddr)
+	l := len(au.EthAddr)
 	au.EthAddr[fordel] = au.EthAddr[l-1]
 
 	au.EthAddr = au.EthAddr[:l-1]
@@ -161,25 +155,24 @@ func (au *AdminUser)DelUser(id string) error  {
 	return nil
 }
 
-func (au *AdminUser)ListUser() []string  {
+func (au *AdminUser) ListUser() []string {
 	au.Lock.Lock()
 	defer au.Lock.Unlock()
 
 	var r []string
 
-	for i:=0;i<len(au.EthAddr);i++{
-		r = append(r,au.EthAddr[i])
+	for i := 0; i < len(au.EthAddr); i++ {
+		r = append(r, au.EthAddr[i])
 	}
 
 	return r
 }
-func (au *AdminUser)listUser() []string  {
-
+func (au *AdminUser) listUser() []string {
 
 	var r []string
 
-	for i:=0;i<len(au.EthAddr);i++{
-		r = append(r,au.EthAddr[i])
+	for i := 0; i < len(au.EthAddr); i++ {
+		r = append(r, au.EthAddr[i])
 	}
 
 	return r

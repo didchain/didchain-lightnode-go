@@ -7,8 +7,8 @@ import (
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/didchain/didCard-go/account"
 	"github.com/didchain/didchain-lightnode-go/protocol"
-	"github.com/ethereum/go-ethereum/crypto"
 	act2 "github.com/didchain/didchain-lightnode-go/test/account"
+	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/kprc/nbsnetwork/tools"
 	"github.com/kprc/nbsnetwork/tools/httputil"
 	"io/ioutil"
@@ -16,12 +16,9 @@ import (
 	"strconv"
 )
 
-func main()  {
-
-
+func main() {
 
 	//testinterface()
-
 
 	//testloadwallet()
 
@@ -42,10 +39,8 @@ func main()  {
 	//testw1,_=account.NewWallet("123")
 	//fmt.Println(testw1.Did().String())
 
-
-
-	accesstoken,err:=gettoken()
-	if err!=nil{
+	accesstoken, err := gettoken()
+	if err != nil {
 		fmt.Println(err)
 		return
 	}
@@ -54,18 +49,17 @@ func main()  {
 
 	var (
 		w act2.Wallet
-
 	)
 
-	walletfile:="/Users/rickeyliao/gowork/src/github.com/didchain/didchain-lightnode-go/test/testwallet4"
+	walletfile := "/Users/rickeyliao/gowork/src/github.com/didchain/didchain-lightnode-go/test/testwallet4"
 
-	if tools.FileExists(walletfile){
-		w,_=act2.LoadWallet(walletfile)
+	if tools.FileExists(walletfile) {
+		w, _ = act2.LoadWallet(walletfile)
 
 		w.Open("123")
 
-	}else{
-		w,_=act2.NewWallet("123")
+	} else {
+		w, _ = act2.NewWallet("123")
 		w.SaveToPath(walletfile)
 	}
 
@@ -77,72 +71,68 @@ func main()  {
 
 	hash := crypto.Keccak256([]byte(to))
 
-	sig,_:=w.Sign(hash)
+	sig, _ := w.Sign(hash)
 
-	verifysig(sig,accesstoken)
+	verifysig(sig, accesstoken)
 
 	var wl account.Wallet
-	wp:="/Users/rickeyliao/gowork/src/github.com/didchain/didchain-lightnode-go/test/tw2"
-	if tools.FileExists(wp){
-		wl,_=account.LoadWallet(wp)
+	wp := "/Users/rickeyliao/gowork/src/github.com/didchain/didchain-lightnode-go/test/tw2"
+	if tools.FileExists(wp) {
+		wl, _ = account.LoadWallet(wp)
 		fmt.Println(wl.String())
-
 
 		wl.Open("123")
 
-	}else{
-		wl,_=account.NewWallet("123")
+	} else {
+		wl, _ = account.NewWallet("123")
 		wl.SaveToPath(wp)
 	}
 
-
-	addUser(wl.Did().String(),accesstoken)
-	delUser(wl.Did().String(),accesstoken)
+	addUser(wl.Did().String(), accesstoken)
+	delUser(wl.Did().String(), accesstoken)
 	countUser(accesstoken)
 	listUser(accesstoken)
 	listunauth(accesstoken)
 }
 
-
-
-func listUser(token string)  {
+func listUser(token string) {
 	type UserReqParam struct {
-		PageSize     int  `json:"page_size"`
-		PageNum      int  `json:"page_num"`
+		PageSize int `json:"page_size"`
+		PageNum  int `json:"page_num"`
 	}
 
 	type Request struct {
 		AccessToken string      `json:"access_token"`
 		Data        interface{} `json:"data,omitempty"`
 	}
-	urp:=&UserReqParam{
+	urp := &UserReqParam{
 		PageSize: 20,
-		PageNum: 0,
+		PageNum:  0,
 	}
 
-	r:=&Request{
+	r := &Request{
 		AccessToken: token,
-		Data: urp,
+		Data:        urp,
 	}
 
-	url:="http://39.99.198.143:50999/api/user/listUser"
-	j,_:=json.MarshalIndent(r," ","\t")
-	fmt.Println(url,"send to ",string(j))
-	resp,_,err:=httputil.Post(url,string(j),false)
-	if err!=nil{
+	url := "http://39.99.198.143:50999/api/user/listUser"
+	j, _ := json.MarshalIndent(r, " ", "\t")
+	fmt.Println(url, "send to ", string(j))
+	resp, _, err := httputil.Post(url, string(j), false)
+	if err != nil {
 		fmt.Println(err)
 		return
 	}
 	type UserDesc struct {
-		Name string	`json:"name"`
-		UnitName string `json:"unit_name"`
+		Name         string `json:"name"`
+		UnitName     string `json:"unit_name"`
 		SerialNumber string `json:"serial_number"`
-		Did string `json:"did"`
+		Did          string `json:"did"`
 	}
 	type UserListDetails struct {
-		PageSize     int  `json:"page_size"`
-		PageNum      int  `json:"page_num"`
-		Uds []*UserDesc   `json:"uds"`
+		PageSize int         `json:"page_size"`
+		PageNum  int         `json:"page_num"`
+		Uds      []*UserDesc `json:"uds"`
 	}
 
 	uld := &UserListDetails{}
@@ -152,17 +142,17 @@ func listUser(token string)  {
 		Message    string      `json:"message"`
 		Data       interface{} `json:"data,omitempty"`
 	}
-	res:=&Response{
+	res := &Response{
 		Data: uld,
 	}
 
-	json.Unmarshal([]byte(resp),res)
+	json.Unmarshal([]byte(resp), res)
 
-	fmt.Println("response",resp)
+	fmt.Println("response", resp)
 
 }
 
-func listunauth(token string)  {
+func listunauth(token string) {
 	var b bool
 
 	type Request struct {
@@ -171,47 +161,44 @@ func listunauth(token string)  {
 	}
 	r := &Request{
 		AccessToken: token,
-		Data: &b,
+		Data:        &b,
 	}
 
-
-	url:="http://39.99.198.143:50999/api/user/listUser4Add"
-	j,_:=json.MarshalIndent(r," ","\t")
-	fmt.Println(url,"send to ",string(j))
-	resp,_,err:=httputil.Post(url,string(j),false)
-	if err!=nil{
+	url := "http://39.99.198.143:50999/api/user/listUser4Add"
+	j, _ := json.MarshalIndent(r, " ", "\t")
+	fmt.Println(url, "send to ", string(j))
+	resp, _, err := httputil.Post(url, string(j), false)
+	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
 	type ListItem struct {
 		Did string `json:"did"`
-		T int64 `json:"t"`
+		T   int64  `json:"t"`
 	}
 
 	type ListUser4Add struct {
 		Dids []*ListItem `json:"dids"`
 	}
 
-	lua:=&ListUser4Add{}
+	lua := &ListUser4Add{}
 
 	type Response struct {
 		ResultCode int         `json:"result_code"`
 		Message    string      `json:"message"`
 		Data       interface{} `json:"data,omitempty"`
 	}
-	res:=&Response{
+	res := &Response{
 		Data: lua,
 	}
 
+	json.Unmarshal([]byte(resp), res)
 
-	json.Unmarshal([]byte(resp),res)
-
-	fmt.Println("response",resp)
+	fmt.Println("response", resp)
 }
 
-
-func countUser(token string)  {
+func countUser(token string) {
 	var b bool
 
 	type Request struct {
@@ -220,15 +207,14 @@ func countUser(token string)  {
 	}
 	r := &Request{
 		AccessToken: token,
-		Data: &b,
+		Data:        &b,
 	}
 
-
-	url:="http://39.99.198.143:50999/api/user/count"
-	j,_:=json.MarshalIndent(r," ","\t")
-	fmt.Println(url,"send to ",string(j))
-	resp,_,err:=httputil.Post(url,string(j),false)
-	if err!=nil{
+	url := "http://39.99.198.143:50999/api/user/count"
+	j, _ := json.MarshalIndent(r, " ", "\t")
+	fmt.Println(url, "send to ", string(j))
+	resp, _, err := httputil.Post(url, string(j), false)
+	if err != nil {
 		fmt.Println(err)
 		return
 	}
@@ -240,17 +226,16 @@ func countUser(token string)  {
 		Message    string      `json:"message"`
 		Data       interface{} `json:"data,omitempty"`
 	}
-	res:=&Response{
+	res := &Response{
 		Data: &count,
 	}
 
+	json.Unmarshal([]byte(resp), res)
 
-	json.Unmarshal([]byte(resp),res)
-
-	fmt.Println("response",resp)
+	fmt.Println("response", resp)
 }
 
-func delUser(did string,token string)  {
+func delUser(did string, token string) {
 
 	type Request struct {
 		AccessToken string      `json:"access_token"`
@@ -258,15 +243,14 @@ func delUser(did string,token string)  {
 	}
 	r := &Request{
 		AccessToken: token,
-		Data: &did,
+		Data:        &did,
 	}
 
-
-	url:="http://39.99.198.143:50999/api/user/del"
-	j,_:=json.MarshalIndent(r," ","\t")
-	fmt.Println(url,"send to ",string(j))
-	resp,_,err:=httputil.Post(url,string(j),false)
-	if err!=nil{
+	url := "http://39.99.198.143:50999/api/user/del"
+	j, _ := json.MarshalIndent(r, " ", "\t")
+	fmt.Println(url, "send to ", string(j))
+	resp, _, err := httputil.Post(url, string(j), false)
+	if err != nil {
 		fmt.Println(err)
 		return
 	}
@@ -276,21 +260,19 @@ func delUser(did string,token string)  {
 		Message    string      `json:"message"`
 		Data       interface{} `json:"data,omitempty"`
 	}
-	res:=&Response{}
+	res := &Response{}
 
+	json.Unmarshal([]byte(resp), res)
 
-	json.Unmarshal([]byte(resp),res)
-
-	fmt.Println("response",resp)
+	fmt.Println("response", resp)
 }
 
-
-func addUser(did string,token string)  {
+func addUser(did string, token string) {
 	type UserDesc struct {
-		Name string	`json:"name"`
-		UnitName string `json:"unit_name"`
+		Name         string `json:"name"`
+		UnitName     string `json:"unit_name"`
 		SerialNumber string `json:"serial_number"`
-		Did string `json:"did"`
+		Did          string `json:"did"`
 	}
 
 	type Request struct {
@@ -298,25 +280,25 @@ func addUser(did string,token string)  {
 		Data        interface{} `json:"data,omitempty"`
 	}
 
-	ud:=&UserDesc{
-		Name: "rickey",
-		UnitName: "unit 5",
+	ud := &UserDesc{
+		Name:         "rickey",
+		UnitName:     "unit 5",
 		SerialNumber: "112233",
-		Did: did,
+		Did:          did,
 	}
 
 	r := &Request{
 		AccessToken: token,
-		Data: ud,
+		Data:        ud,
 	}
 
-	url:="http://39.99.198.143:50999/api/user/add"
-	j,_:=json.MarshalIndent(r," ","\t")
+	url := "http://39.99.198.143:50999/api/user/add"
+	j, _ := json.MarshalIndent(r, " ", "\t")
 
-	fmt.Println("send to ",string(j))
+	fmt.Println("send to ", string(j))
 
-	resp,_,err:=httputil.Post(url,string(j),false)
-	if err!=nil{
+	resp, _, err := httputil.Post(url, string(j), false)
+	if err != nil {
 		fmt.Println(err)
 		return
 	}
@@ -327,34 +309,33 @@ func addUser(did string,token string)  {
 		Data       interface{} `json:"data,omitempty"`
 	}
 
-	res:=&Response{}
+	res := &Response{}
 
+	json.Unmarshal([]byte(resp), res)
 
-	json.Unmarshal([]byte(resp),res)
-
-	fmt.Println("response",resp)
+	fmt.Println("response", resp)
 
 }
 
-func verifysig(sig []byte, token string)  {
-	url:="http://39.99.198.143:50999/api/auth/verify"
+func verifysig(sig []byte, token string) {
+	url := "http://39.99.198.143:50999/api/auth/verify"
 
 	type AccessSig struct {
 		Sig        string `json:"sig"`
 		AccesToken string `json:"acces_token"`
 	}
 
-	as:=&AccessSig{
-		Sig: base58.Encode(sig),
+	as := &AccessSig{
+		Sig:        base58.Encode(sig),
 		AccesToken: token,
 	}
 
-	j,_:=json.MarshalIndent(as," ","\t")
+	j, _ := json.MarshalIndent(as, " ", "\t")
 
-	fmt.Println("send to ",string(j))
+	fmt.Println("send to ", string(j))
 
-	resp,_,err:=httputil.Post(url,string(j),false)
-	if err!=nil{
+	resp, _, err := httputil.Post(url, string(j), false)
+	if err != nil {
 		fmt.Println(err)
 		return
 	}
@@ -365,41 +346,39 @@ func verifysig(sig []byte, token string)  {
 		AccessToken string `json:"access_token"`
 	}
 
-	vr:=&ValidSigResult{}
+	vr := &ValidSigResult{}
 
-	json.Unmarshal([]byte(resp),vr)
+	json.Unmarshal([]byte(resp), vr)
 
-	fmt.Println("response",resp)
+	fmt.Println("response", resp)
 
 }
 
-
-func gettoken() (string,error) {
-	url:="http://39.99.198.143:50999/api/auth/token"
-	fmt.Println(url,"get")
-	resp,err:=http.Get(url)
-	if err!=nil{
+func gettoken() (string, error) {
+	url := "http://39.99.198.143:50999/api/auth/token"
+	fmt.Println(url, "get")
+	resp, err := http.Get(url)
+	if err != nil {
 		fmt.Println(err)
-		return "",err
+		return "", err
 	}
 
-	r,e:=ioutil.ReadAll(resp.Body)
-	if e!=nil{
+	r, e := ioutil.ReadAll(resp.Body)
+	if e != nil {
 		fmt.Println(e)
-		return "",e
+		return "", e
 	}
 
 	//fmt.Println(string(r))
 
-	return string(r),nil
+	return string(r), nil
 }
 
-
-func SignMessage(did string, latitude, longitude float64, timestamp int64) string  {
-	msg:= struct {
-		DID       string `json:"did"` ///public key in string
-		TimeStamp int64 `json:"time_stamp"`
-		Latitude float64 `json:"latitude"`
+func SignMessage(did string, latitude, longitude float64, timestamp int64) string {
+	msg := struct {
+		DID       string  `json:"did"` ///public key in string
+		TimeStamp int64   `json:"time_stamp"`
+		Latitude  float64 `json:"latitude"`
 		Longitude float64 `json:"longitude"`
 	}{}
 
@@ -408,13 +387,13 @@ func SignMessage(did string, latitude, longitude float64, timestamp int64) strin
 	msg.Latitude = latitude
 	msg.Longitude = longitude
 
-	j,_:=json.Marshal(msg)
+	j, _ := json.Marshal(msg)
 
 	return string(j)
 
 }
 
-func testloadwallet()  {
+func testloadwallet() {
 	////w,_:=account.NewWallet("123")
 	//
 	////fmt.Println("-----",hex.EncodeToString(w.PrivKey()))
@@ -451,65 +430,61 @@ func testloadwallet()  {
 	//
 	//fmt.Println(hex.EncodeToString(wl.PrivKey()))
 
-
-	fmt.Println(SignMessage("didaaa",11,12,11234343))
+	fmt.Println(SignMessage("didaaa", 11, 12, 11234343))
 
 }
 
-func testverifysig()  {
-	w,_:=account.NewWallet("123")
+func testverifysig() {
+	w, _ := account.NewWallet("123")
 	did := w.Did()
 
-	vr:=&protocol.VerfiyPlainMsg{
-		DID: did.String(),
+	vr := &protocol.VerfiyPlainMsg{
+		DID:       did.String(),
 		TimeStamp: 1612312312345,
-		Latitude: 111.21,
+		Latitude:  111.21,
 		Longitude: 21.23,
 	}
 
-	sig:=w.SignJson(vr)
+	sig := w.SignJson(vr)
 
 	req := &protocol.Request{
 		Action: protocol.VerifySignature,
 	}
 
-	svr:=&protocol.VerifyReq{
-		Signature: base58.Encode(sig),
-		VerfiyPlainMsg:*vr,
+	svr := &protocol.VerifyReq{
+		Signature:      base58.Encode(sig),
+		VerfiyPlainMsg: *vr,
 	}
 
 	req.PayLoad = svr
 
-	j,_:=json.MarshalIndent(req," ","\t")
+	j, _ := json.MarshalIndent(req, " ", "\t")
 
 	fmt.Println(string(j))
 
-	b:=account.VerifySig(did,sig,vr)
+	b := account.VerifySig(did, sig, vr)
 
 	fmt.Println(b)
 }
 
+func testinterface() {
+	req := &protocol.Request{Action: protocol.VerifySignature}
 
-func testinterface()  {
-	req:=&protocol.Request{Action: protocol.VerifySignature}
-
-
-
-	var sigbytes = make([]byte,64)
+	var sigbytes = make([]byte, 64)
 	rand.Read(sigbytes)
 
-	vr:=&protocol.VerifyReq{
+	vr := &protocol.VerifyReq{
 		Signature: base58.Encode(sigbytes),
-		VerfiyPlainMsg:protocol.VerfiyPlainMsg{DID: base58.Encode(sigbytes[32:]),
+		VerfiyPlainMsg: protocol.VerfiyPlainMsg{DID: base58.Encode(sigbytes[32:]),
 			TimeStamp: 1234567123456,
-			Latitude: 112.22,
+			Latitude:  112.22,
 			Longitude: 12.22,
 		},
 	}
 
 	req.PayLoad = vr
 
-	j,_:=json.MarshalIndent(req," ","\t")
+	j, _ := json.MarshalIndent(req, " ", "\t")
 
 	fmt.Println(string(j))
 
@@ -520,10 +495,9 @@ func testinterface()  {
 
 	fmt.Println(protocol.ResponseError(protocol.ErrDesc[protocol.ActionErr], protocol.ActionErr).String())
 
-	resp:=&protocol.VerifyResp{Signature: vr}
+	resp := &protocol.VerifyResp{Signature: vr}
 
 	fmt.Println(protocol.ResponseSuccess(resp).String())
-
 
 	fmt.Println(protocol.ResponseError(protocol.ErrDesc[protocol.SignatureNotCorrect], protocol.SignatureNotCorrect).String())
 }

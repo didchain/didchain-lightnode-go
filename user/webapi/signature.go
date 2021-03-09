@@ -11,27 +11,27 @@ import (
 	"net/http"
 )
 
-func (ua *UserAPI)Ed25519Verify(w http.ResponseWriter,r *http.Request)  {
-	if r.Method != "POST"{
+func (ua *UserAPI) Ed25519Verify(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
 		w.WriteHeader(500)
 		w.Write(protocol.ResponseError(protocol.ErrDesc[protocol.MethodNotCorrect], protocol.MethodNotCorrect).Bytes())
 		return
 	}
 
-	rbytes,err:=ioutil.ReadAll(r.Body)
-	if err!=nil{
+	rbytes, err := ioutil.ReadAll(r.Body)
+	if err != nil {
 		w.WriteHeader(200)
 		w.Write(protocol.ResponseError(protocol.ErrDesc[protocol.InterIOErr], protocol.InterIOErr).Bytes())
 		return
 	}
 
-	vr:=&protocol.VerifyReq{}
+	vr := &protocol.VerifyReq{}
 
-	req:=&protocol.Request{
+	req := &protocol.Request{
 		PayLoad: vr,
 	}
 
-	if err:=json.Unmarshal(rbytes,req);err!=nil{
+	if err := json.Unmarshal(rbytes, req); err != nil {
 		w.WriteHeader(200)
 		w.Write(protocol.ResponseError(protocol.ErrDesc[protocol.UnmarshalJsonErr], protocol.UnmarshalJsonErr).Bytes())
 		return
@@ -43,13 +43,13 @@ func (ua *UserAPI)Ed25519Verify(w http.ResponseWriter,r *http.Request)  {
 		return
 	}
 
-	b:=account.VerifySig(account.ID(vr.DID),base58.Decode(vr.Signature),vr.VerfiyPlainMsg)
+	b := account.VerifySig(account.ID(vr.DID), base58.Decode(vr.Signature), vr.VerfiyPlainMsg)
 
-	if b{
+	if b {
 
-		if v:=ua.sdb.FindUser(vr.DID);v==""{
-			fmt.Println("add to unauth..",vr.DID)
-			glist4add.add(vr.DID,tools.GetNowMsTime())
+		if v := ua.sdb.FindUser(vr.DID); v == "" {
+			fmt.Println("add to unauth..", vr.DID)
+			glist4add.add(vr.DID, tools.GetNowMsTime())
 
 			w.WriteHeader(200)
 			w.Write(protocol.ResponseError(protocol.ErrDesc[protocol.UserNotAuthorized], protocol.UserNotAuthorized).Bytes())
@@ -57,10 +57,9 @@ func (ua *UserAPI)Ed25519Verify(w http.ResponseWriter,r *http.Request)  {
 		}
 
 		w.WriteHeader(200)
-		resp:=&protocol.VerifyResp{Signature: vr}
+		resp := &protocol.VerifyResp{Signature: vr}
 		w.Write(protocol.ResponseSuccess(resp).Bytes())
-	}else{
-
+	} else {
 
 		w.WriteHeader(200)
 		w.Write(protocol.ResponseError(protocol.ErrDesc[protocol.SignatureNotCorrect], protocol.SignatureNotCorrect).Bytes())
