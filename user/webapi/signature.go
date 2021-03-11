@@ -34,6 +34,7 @@ func (ua *UserAPI) Ed25519Verify(w http.ResponseWriter, r *http.Request) {
 	if err := json.Unmarshal(rbytes, req); err != nil {
 		w.WriteHeader(200)
 		w.Write(protocol.ResponseError(protocol.ErrDesc[protocol.UnmarshalJsonErr], protocol.UnmarshalJsonErr).Bytes())
+		fmt.Println(err,string(rbytes))
 		return
 	}
 
@@ -48,7 +49,6 @@ func (ua *UserAPI) Ed25519Verify(w http.ResponseWriter, r *http.Request) {
 	if b {
 
 		if v := ua.sdb.FindUser(vr.DID); v == "" {
-			fmt.Println("add to unauth..", vr.DID)
 			glist4add.add(vr.DID, tools.GetNowMsTime())
 
 			w.WriteHeader(200)

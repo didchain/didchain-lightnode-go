@@ -43,14 +43,11 @@ func (lu *ListUser4Add) add(did string, t int64) {
 
 	lu.Dids = append(lu.Dids, &ListItem{Did: did, T: t})
 
-	fmt.Println("11111", lu.Dids)
-
 	l := len(lu.Dids)
 	if l > 3 {
 		lu.Dids = lu.Dids[l-3 : l]
 	}
 
-	fmt.Println("22222", lu.Dids)
 	return
 }
 
@@ -151,8 +148,6 @@ func (ua *UserAPI) ListUser(w http.ResponseWriter, r *http.Request) {
 		json.Unmarshal(data, ud)
 		return ud
 	}, param.PageNum*param.PageSize, param.PageSize)
-
-	fmt.Println("list user uapi", len(uas))
 
 	for i := 0; i < len(uas); i++ {
 		data.Uds = append(data.Uds, uas[i].(*UserDesc))

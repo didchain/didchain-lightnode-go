@@ -18,7 +18,7 @@ const (
 )
 
 var (
-	sessionTimeout int = 600000 //10 minutes
+	sessionTimeout int = 600 //10 minutes
 	quit           chan struct{}
 	wg             sync.WaitGroup
 	accessSession  map[[RandBytesCount]byte]*SessionDesc
