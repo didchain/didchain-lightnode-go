@@ -58,10 +58,11 @@ func (s *Storage) DelUser(did string) {
 		Sync: true,
 	}
 
+	fmt.Println("delete user", did)
+
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
-	fmt.Println("delete user", did)
 
 	if err := s.db.Delete([]byte(didUserKey(did)), wo); err != nil {
 		fmt.Println("Storage delete", did, "failed")
@@ -100,6 +101,24 @@ func (s *Storage) ListAll() []string {
 
 	return vs
 }
+
+func (s *Storage)Count() int  {
+	s.lock.RLock()
+	defer s.lock.RUnlock()
+
+	r := &util.Range{Start: []byte(UserListBegin), Limit: []byte(UserListEnd)}
+	iter := s.db.NewIterator(r, nil)
+	defer iter.Release()
+
+	var count int
+
+	for iter.Next() {
+		count ++
+	}
+
+	return count
+}
+
 
 func (s *Storage) ListAllValue(convert func(data []byte) interface{}) []interface{} {
 	s.lock.RLock()

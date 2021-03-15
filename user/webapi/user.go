@@ -170,8 +170,7 @@ func (ua *UserAPI) UserCount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	allusers := ua.sdb.ListAll()
-	count := len(allusers)
+	count := ua.sdb.Count()
 
 	resp.Data = &count
 
