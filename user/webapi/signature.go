@@ -34,7 +34,7 @@ func (ua *UserAPI) Ed25519Verify(w http.ResponseWriter, r *http.Request) {
 	if err := json.Unmarshal(rbytes, req); err != nil {
 		w.WriteHeader(200)
 		w.Write(protocol.ResponseError(protocol.ErrDesc[protocol.UnmarshalJsonErr], protocol.UnmarshalJsonErr).Bytes())
-		fmt.Println(err,string(rbytes))
+		fmt.Println(err, string(rbytes))
 		return
 	}
 
