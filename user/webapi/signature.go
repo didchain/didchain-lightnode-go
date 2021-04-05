@@ -49,7 +49,7 @@ func (ua *UserAPI) Ed25519Verify(w http.ResponseWriter, r *http.Request) {
 	if b {
 
 		if v := ua.sdb.FindUser(vr.DID); v == "" {
-			glist4add.add(vr.DID, tools.GetNowMsTime())
+			Glist4add.Add(vr.DID, tools.GetNowMsTime())
 
 			w.WriteHeader(200)
 			w.Write(protocol.ResponseError(protocol.ErrDesc[protocol.UserNotAuthorized], protocol.UserNotAuthorized).Bytes())

@@ -12,7 +12,7 @@ type cmdService struct{}
 
 func StartCmdService() {
 
-	l, err := net.Listen("tcp", "127.0.0.1:50998")
+	l, err := net.Listen("tcp", "127.0.0.1:60990")
 	if err != nil {
 		panic(err)
 	}
@@ -28,7 +28,7 @@ func StartCmdService() {
 }
 
 func DialToCmdService() pbs.CmdServiceClient {
-	var address = "127.0.0.1:50998"
+	var address = "127.0.0.1:60990"
 	conn, err := grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {
 		panic(err)

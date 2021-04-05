@@ -7,13 +7,13 @@ import (
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/didchain/didCard-go/account"
 	"github.com/didchain/didchain-lightnode-go/protocol"
-	act2 "github.com/didchain/didchain-lightnode-go/test/account"
-	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/kprc/nbsnetwork/tools"
+	"os"
+
+	//"github.com/kprc/nbsnetwork/tools"
 	"github.com/kprc/nbsnetwork/tools/httputil"
 	"io/ioutil"
 	"net/http"
-	"strconv"
 )
 
 func main() {
@@ -39,60 +39,212 @@ func main() {
 	//testw1,_=account.NewWallet("123")
 	//fmt.Println(testw1.Did().String())
 
-	accesstoken, err := gettoken()
+	//accesstoken, err := gettoken()
+	//if err != nil {
+	//	fmt.Println(err)
+	//	return
+	//}
+	//
+	//fmt.Println(accesstoken)
+	//
+	//var (
+	//	w act2.Wallet
+	//)
+	//
+	//walletfile := "/Users/rickeyliao/gowork/src/github.com/didchain/didchain-lightnode-go/test/testwallet4"
+	//
+	//if tools.FileExists(walletfile) {
+	//	w, _ = act2.LoadWallet(walletfile)
+	//
+	//	w.Open("123")
+	//
+	//} else {
+	//	w, _ = act2.NewWallet("123")
+	//	w.SaveToPath(walletfile)
+	//}
+	//
+	//fmt.Println(w.MainAddress().String())
+	//
+	//to := "\x19Ethereum Signed Message:\n"
+	//to += strconv.Itoa(len(accesstoken))
+	//to += accesstoken
+	//
+	//hash := crypto.Keccak256([]byte(to))
+	//
+	//sig, _ := w.Sign(hash)
+	//
+	//verifysig(sig, accesstoken)
+	//
+	//var wl account.Wallet
+	//wp := "/Users/rickeyliao/gowork/src/github.com/didchain/didchain-lightnode-go/test/tw2"
+	//if tools.FileExists(wp) {
+	//	wl, _ = account.LoadWallet(wp)
+	//	fmt.Println(wl.String())
+	//
+	//	wl.Open("123")
+	//
+	//} else {
+	//	wl, _ = account.NewWallet("123")
+	//	wl.SaveToPath(wp)
+	//}
+	//
+	//addUser(wl.Did().String(), accesstoken)
+	//delUser(wl.Did().String(), accesstoken)
+	//countUser(accesstoken)
+	//listUser(accesstoken)
+	//listunauth(accesstoken)
+
+	//auth:=&protocol.AuthContent{}
+	//auth.AuthUrl = "http://39.99.198.143:60999/api/auth"
+	//buf:=make([]byte,32)
+	//
+	//rand.Read(buf)
+	//
+	//auth.RandomToken = base58.Encode(buf)
+	//
+	//j,_:=json.Marshal(*auth)
+	//
+	//fmt.Println(string(j))
+	//
+	uamwalletPathh:="./uamwallet"
+	//
+	var wl account.Wallet
+	if ok:=tools.FileExists(uamwalletPathh);!ok{
+		wl,_=account.NewWallet("123")
+		wl.SaveToPath(uamwalletPathh)
+	}else{
+		wl,_=account.LoadWallet(uamwalletPathh)
+		wl.Open("123")
+	}
+
+	if len(os.Args)>1{
+		randbytes:=os.Args[1]
+
+		fmt.Println(randbytes)
+		verifyuam2(wl,randbytes)
+		return
+	}
+
+	ac,_:=gettoken()
+
+	verifyuam(wl,ac)
+
+	checkAc(ac)
+
+	//content:=&protocol.UAMSignatureContent{}
+	//content.RandomToken = auth.RandomToken
+	//content.AuthUrl = auth.AuthUrl
+	//content.DID = wl.Did().String()
+	//
+	//j,_=json.Marshal(*content)
+	//
+	//sig:=wl.SignJson(j)
+	//
+	//signature:=&protocol.UAMSignature{}
+	//signature.Content = content
+	//signature.Signature = sig
+	//
+	//
+	//j,_=json.Marshal(*signature)
+	//
+	//fmt.Println(string(j))
+	//
+	//chck:=&protocol.UAMCheck{
+	//	RedirUrl: "http://39.99.198.143:60999/login",
+	//}
+	//
+	//resp:=&protocol.UAMResponse{
+	//	Message: "success",
+	//	ResultCode: 0,
+	//	Data: chck,
+	//}
+	//
+	//j,_=json.Marshal(*resp)
+	//
+	//fmt.Println(string(j))
+
+}
+
+func verifyuam2(w account.Wallet, ac string)  {
+	content:=&protocol.UAMSignatureContent{
+		AuthUrl: "http://39.99.198.143:60998/verify",
+		RandomToken: ac,
+		DID: w.Did().String(),
+	}
+
+	sigbytes:=w.SignJson(content)
+
+	sig:=&protocol.UAMSignature{
+		Content: content,
+		Signature: base58.Encode(sigbytes),
+	}
+
+	url := "http://39.99.198.143:60998/api/verify"
+
+	j, _ := json.MarshalIndent(sig, " ", "\t")
+	fmt.Println(url, "send to ", string(j))
+	//resp, _, err := httputil.Post(url, string(j), false)
+	//if err != nil {
+	//	fmt.Println(err)
+	//	return
+	//}
+	//
+	//uamr:=&protocol.UAMResponse{}
+	//json.Unmarshal([]byte(resp),uamr)
+	//fmt.Println(resp)
+
+}
+
+
+func verifyuam(w account.Wallet, ac *protocol.AuthContent)  {
+	content:=&protocol.UAMSignatureContent{
+		AuthUrl: ac.AuthUrl,
+		RandomToken: ac.RandomToken,
+		DID: w.Did().String(),
+	}
+
+	sigbytes:=w.SignJson(content)
+
+	sig:=&protocol.UAMSignature{
+		Content: content,
+		Signature: base58.Encode(sigbytes),
+	}
+
+	url := "http://39.99.198.143:60998/api/verify"
+
+	j, _ := json.MarshalIndent(sig, " ", "\t")
+	fmt.Println(url, "send to ", string(j))
+	resp, _, err := httputil.Post(url, string(j), false)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	fmt.Println(accesstoken)
+	uamr:=&protocol.UAMResponse{}
+	json.Unmarshal([]byte(resp),uamr)
+	fmt.Println(resp)
 
-	var (
-		w act2.Wallet
-	)
+}
 
-	walletfile := "/Users/rickeyliao/gowork/src/github.com/didchain/didchain-lightnode-go/test/testwallet4"
+func checkAc(ac *protocol.AuthContent)  {
+	url := "http://39.99.198.143:60998/api/check"
+	j,_:=json.Marshal(*ac)
+	resp, _, err := httputil.Post(url, string(j), false)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	uc:=&protocol.UAMCheck{}
 
-	if tools.FileExists(walletfile) {
-		w, _ = act2.LoadWallet(walletfile)
+	uamr := &protocol.UAMResponse{Data: uc}
 
-		w.Open("123")
+	json.Unmarshal([]byte(resp),uamr)
 
-	} else {
-		w, _ = act2.NewWallet("123")
-		w.SaveToPath(walletfile)
+	if uc.UserDesc != nil{
+		fmt.Println(uc.UserDesc.Name)
 	}
 
-	fmt.Println(w.MainAddress().String())
 
-	to := "\x19Ethereum Signed Message:\n"
-	to += strconv.Itoa(len(accesstoken))
-	to += accesstoken
-
-	hash := crypto.Keccak256([]byte(to))
-
-	sig, _ := w.Sign(hash)
-
-	verifysig(sig, accesstoken)
-
-	var wl account.Wallet
-	wp := "/Users/rickeyliao/gowork/src/github.com/didchain/didchain-lightnode-go/test/tw2"
-	if tools.FileExists(wp) {
-		wl, _ = account.LoadWallet(wp)
-		fmt.Println(wl.String())
-
-		wl.Open("123")
-
-	} else {
-		wl, _ = account.NewWallet("123")
-		wl.SaveToPath(wp)
-	}
-
-	addUser(wl.Did().String(), accesstoken)
-	delUser(wl.Did().String(), accesstoken)
-	countUser(accesstoken)
-	listUser(accesstoken)
-	listunauth(accesstoken)
 }
 
 func listUser(token string) {
@@ -354,24 +506,29 @@ func verifysig(sig []byte, token string) {
 
 }
 
-func gettoken() (string, error) {
-	url := "http://39.99.198.143:50999/api/auth/token"
+func gettoken() (*protocol.AuthContent, error) {
+	url := "http://39.99.198.143:60998/api/auth"
 	fmt.Println(url, "get")
 	resp, err := http.Get(url)
 	if err != nil {
 		fmt.Println(err)
-		return "", err
+		return nil, err
 	}
 
 	r, e := ioutil.ReadAll(resp.Body)
 	if e != nil {
 		fmt.Println(e)
-		return "", e
+		return nil, e
 	}
 
-	//fmt.Println(string(r))
 
-	return string(r), nil
+	fmt.Println(string(r))
+	ac:=&protocol.AuthContent{}
+
+	json.Unmarshal(r,ac)
+
+
+	return ac, nil
 }
 
 func SignMessage(did string, latitude, longitude float64, timestamp int64) string {
@@ -394,11 +551,11 @@ func SignMessage(did string, latitude, longitude float64, timestamp int64) strin
 }
 
 func testloadwallet() {
-	////w,_:=account.NewWallet("123")
-	//
-	////fmt.Println("-----",hex.EncodeToString(w.PrivKey()))
+	//w,_:=account.NewWallet("123")
+
+	//fmt.Println("-----",hex.EncodeToString(w.PrivKey()))
 	//wp:="/Users/rickeyliao/gowork/src/github.com/didchain/didchain-lightnode-go/test/testwallet"
-	////w.SaveToPath(wp)
+	//w.SaveToPath(wp)
 	//
 	////fmt.Println(w.String())
 	//

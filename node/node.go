@@ -5,7 +5,9 @@ import (
 	"github.com/btcsuite/goleveldb/leveldb/filter"
 	"github.com/btcsuite/goleveldb/leveldb/opt"
 	"github.com/didchain/didchain-lightnode-go/config"
+	"github.com/didchain/didchain-lightnode-go/loginUam"
 	"github.com/didchain/didchain-lightnode-go/user/storage"
+	"log"
 )
 
 type LightNode struct {
@@ -14,10 +16,6 @@ type LightNode struct {
 }
 
 func NewNode(cfg *config.NodeConfig) *LightNode {
-
-	//if !tools.FileExists(cfg.DatabasePath){
-	//	os.MkdirAll(cfg.DatabasePath,0755)
-	//}
 
 	opts := opt.Options{
 		Strict:      opt.DefaultStrict,
@@ -32,17 +30,21 @@ func NewNode(cfg *config.NodeConfig) *LightNode {
 
 	node := &LightNode{
 		conf: cfg,
-		worker: &Worker{port: cfg.ListenPort, storage: storage.NewStorage(db),
-			admin: config.LoadAdminUser(cfg.AdminUserDb)},
+		worker: &Worker{port: cfg.ListenPort,loginwebport: cfg.LoginPort,storage: storage.NewStorage(db),
+			admin: config.LoadAdminUser(cfg.AdminUserDb),cfg: cfg,sessionStorage: loginUam.NewSessStorage(cfg)},
 	}
 
 	return node
 }
 
 func (sn *LightNode) Start() {
+	log.Println("begin to start web")
 	sn.worker.StartWebDaemon()
+
+	log.Println("begin to start login web")
+	sn.worker.StartLoginWebDaemon()
 }
 
 func (sn *LightNode) Stop() {
-	sn.worker.StopWebDaemon()
+	sn.worker.StopWorker()
 }

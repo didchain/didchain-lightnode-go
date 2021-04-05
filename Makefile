@@ -19,6 +19,7 @@ all: lnx mac arm
 
 staticfile:
 	go-bindata -o $(resdir)/webfs/webfs.go -pkg=webfs $(resdir)/html/dist/...
+	go-bindata -o $(resdir)/uamfs/uamfs.go -pkg=uamfs $(resdir)/html/dist2/...
 
 mac: staticfile
 	GOOS=darwin go build -ldflags '-w -s' -o $(BINDIR)/$(NAME).mac

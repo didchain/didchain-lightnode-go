@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/didchain/didchain-lightnode-go/config"
+	"github.com/didchain/didchain-lightnode-go/protocol"
 	"github.com/didchain/didchain-lightnode-go/user/storage"
 	"net/http"
 	"sync"
@@ -23,14 +24,14 @@ type ListUser4Add struct {
 	Dids []*ListItem `json:"dids"`
 }
 
-var glist4add *ListUser4Add
+var Glist4add *ListUser4Add
 var glistlock sync.Mutex
 
 func init() {
-	glist4add = &ListUser4Add{}
+	Glist4add = &ListUser4Add{}
 }
 
-func (lu *ListUser4Add) add(did string, t int64) {
+func (lu *ListUser4Add) Add(did string, t int64) {
 	glistlock.Lock()
 	defer glistlock.Unlock()
 
@@ -73,15 +74,9 @@ func NewUserAPI(sdb *storage.Storage, admin *config.AdminUser) *UserAPI {
 	return &UserAPI{sdb: sdb, admin: admin}
 }
 
-type UserDesc struct {
-	Name         string `json:"name"`
-	UnitName     string `json:"unit_name"`
-	SerialNumber string `json:"serial_number"`
-	Did          string `json:"did"`
-}
 
 func (ua *UserAPI) AddUser(w http.ResponseWriter, r *http.Request) {
-	var ud UserDesc
+	var ud protocol.UserDesc
 	_, resp := doRequest(r, &ud)
 	if resp.ResultCode > 0 {
 		j, _ := json.Marshal(*resp)
@@ -124,7 +119,7 @@ type UserReqParam struct {
 type UserListDetails struct {
 	PageSize int         `json:"page_size"`
 	PageNum  int         `json:"page_num"`
-	Uds      []*UserDesc `json:"uds"`
+	Uds      []*protocol.UserDesc `json:"uds"`
 }
 
 func (ua *UserAPI) ListUser(w http.ResponseWriter, r *http.Request) {
@@ -144,13 +139,13 @@ func (ua *UserAPI) ListUser(w http.ResponseWriter, r *http.Request) {
 	resp.Data = data
 
 	uas := ua.sdb.ListAllValue2(func(data []byte) interface{} {
-		ud := &UserDesc{}
+		ud := &protocol.UserDesc{}
 		json.Unmarshal(data, ud)
 		return ud
 	}, param.PageNum*param.PageSize, param.PageSize)
 
 	for i := 0; i < len(uas); i++ {
-		data.Uds = append(data.Uds, uas[i].(*UserDesc))
+		data.Uds = append(data.Uds, uas[i].(*protocol.UserDesc))
 	}
 
 	j, _ := json.Marshal(*resp)
@@ -191,7 +186,7 @@ func (ua *UserAPI) ListUnAuthorizeUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp.Data = glist4add.dup()
+	resp.Data = Glist4add.dup()
 
 	j, _ := json.Marshal(*resp)
 	w.WriteHeader(200)
