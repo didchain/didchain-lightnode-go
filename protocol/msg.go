@@ -37,7 +37,7 @@ type Response struct {
 	PayLoad interface{} `json:"payload"`
 }
 
-type  VerfiyPlainMsg struct {
+type VerfiyPlainMsg struct {
 	DID       string  `json:"did"` ///public key in string
 	TimeStamp int64   `json:"time_stamp"`
 	Latitude  float64 `json:"latitude"`

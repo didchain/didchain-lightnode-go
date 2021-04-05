@@ -74,7 +74,6 @@ func NewUserAPI(sdb *storage.Storage, admin *config.AdminUser) *UserAPI {
 	return &UserAPI{sdb: sdb, admin: admin}
 }
 
-
 func (ua *UserAPI) AddUser(w http.ResponseWriter, r *http.Request) {
 	var ud protocol.UserDesc
 	_, resp := doRequest(r, &ud)
@@ -117,8 +116,8 @@ type UserReqParam struct {
 }
 
 type UserListDetails struct {
-	PageSize int         `json:"page_size"`
-	PageNum  int         `json:"page_num"`
+	PageSize int                  `json:"page_size"`
+	PageNum  int                  `json:"page_num"`
 	Uds      []*protocol.UserDesc `json:"uds"`
 }
 

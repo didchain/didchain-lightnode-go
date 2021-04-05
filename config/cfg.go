@@ -15,13 +15,13 @@ const lightNodeConfFile = "did-conf-file.json"
 const leveldbDir = "db"
 
 type NodeConfig struct {
-	ListenPort   int    `json:"listen_port"`
-	LoginPort    int    `json:"login_port"`
-	DatabasePath string `json:"database_path"`
-	AdminUserDb  string `json:"admin_user_db"`
-	LoginUrl     string `json:"login_url"`
+	ListenPort     int    `json:"listen_port"`
+	LoginPort      int    `json:"login_port"`
+	DatabasePath   string `json:"database_path"`
+	AdminUserDb    string `json:"admin_user_db"`
+	LoginUrl       string `json:"login_url"`
 	SessiontimeOut int64  `json:"sessiontime_out"`
-	RedirUrl    string `json:"redir_url"`
+	RedirUrl       string `json:"redir_url"`
 }
 
 func LightNodeHome() string {
@@ -50,12 +50,12 @@ func InitNodeConf() *NodeConfig {
 
 	} else {
 		cfg = &NodeConfig{
-			ListenPort:   60999,
-			LoginPort: 60998,
-			DatabasePath: path.Join(LightNodeHome(), leveldbDir),
-			AdminUserDb:  path.Join(LightNodeHome(), "adminUser.db"),
-			LoginUrl: "http://39.99.198.143:60998/api/verify",
-			RedirUrl: "http://39.99.198.143:60998/index.html",
+			ListenPort:     60999,
+			LoginPort:      60998,
+			DatabasePath:   path.Join(LightNodeHome(), leveldbDir),
+			AdminUserDb:    path.Join(LightNodeHome(), "adminUser.db"),
+			LoginUrl:       "http://39.99.198.143:60998/api/verify",
+			RedirUrl:       "http://39.99.198.143:60998/index.html",
 			SessiontimeOut: 1200000,
 		}
 

@@ -7,8 +7,8 @@ import (
 	"github.com/didchain/didchain-lightnode-go/user/session"
 	"github.com/didchain/didchain-lightnode-go/user/storage"
 	"github.com/didchain/didchain-lightnode-go/user/webapi"
-	"github.com/didchain/didchain-lightnode-go/webpages/webfs"
 	"github.com/didchain/didchain-lightnode-go/webpages/uamfs"
+	"github.com/didchain/didchain-lightnode-go/webpages/webfs"
 	assetfs "github.com/elazarl/go-bindata-assetfs"
 	"log"
 	"net/http"
@@ -18,14 +18,14 @@ import (
 )
 
 type Worker struct {
-	port      int
-	loginwebport int
+	port           int
+	loginwebport   int
 	loginwebserver *http.Server
-	webserver *http.Server
-	storage   *storage.Storage
-	admin     *config.AdminUser
+	webserver      *http.Server
+	storage        *storage.Storage
+	admin          *config.AdminUser
 	sessionStorage *loginUam.SessStorage
-	cfg *config.NodeConfig
+	cfg            *config.NodeConfig
 }
 
 func (w *Worker) StartWebDaemon() {
@@ -57,16 +57,16 @@ func (w *Worker) StartWebDaemon() {
 	go w.webserver.ListenAndServe()
 }
 
-func (w *Worker)StartLoginWebDaemon()  {
+func (w *Worker) StartLoginWebDaemon() {
 	mux := http.NewServeMux()
 
-	uamapi:=loginUam.NewUamAPI(w.storage,w.sessionStorage,w.cfg)
+	uamapi := loginUam.NewUamAPI(w.storage, w.sessionStorage, w.cfg)
 
-	mux.HandleFunc("/api/auth",uamapi.Auth)
-	mux.HandleFunc("/api/verify",uamapi.Verify)
-	mux.HandleFunc("/api/check",uamapi.Check)
-	mux.HandleFunc("/api/checkLogin",uamapi.CheckLogin)
-	mux.HandleFunc("/api/logout",uamapi.Logout)
+	mux.HandleFunc("/api/auth", uamapi.Auth)
+	mux.HandleFunc("/api/verify", uamapi.Verify)
+	mux.HandleFunc("/api/check", uamapi.Check)
+	mux.HandleFunc("/api/checkLogin", uamapi.CheckLogin)
+	mux.HandleFunc("/api/logout", uamapi.Logout)
 
 	wfs := assetfs.AssetFS{Asset: uamfs.Asset, AssetDir: uamfs.AssetDir, AssetInfo: uamfs.AssetInfo, Prefix: "webpages/html/dist2"}
 
@@ -77,7 +77,6 @@ func (w *Worker)StartLoginWebDaemon()  {
 	w.loginwebserver = &http.Server{Addr: addr, Handler: mux}
 	go w.loginwebserver.ListenAndServe()
 }
-
 
 func (w *Worker) stopWebDaemon() {
 	if w.webserver == nil {
@@ -93,11 +92,11 @@ func (w *Worker) stopWebDaemon() {
 	log.Println("Web Server Stopped")
 }
 
-func (w *Worker)stopLoginWebDaemon()  {
-	if w.loginwebserver == nil{
+func (w *Worker) stopLoginWebDaemon() {
+	if w.loginwebserver == nil {
 		return
 	}
-	ctx,_:=context.WithTimeout(context.Background(),5*time.Second)
+	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 	w.loginwebserver.Shutdown(ctx)
 
 	w.loginwebserver = nil
@@ -105,7 +104,7 @@ func (w *Worker)stopLoginWebDaemon()  {
 	log.Println("Login Web Server Stopped")
 }
 
-func (w *Worker)StopWorker()  {
+func (w *Worker) StopWorker() {
 	w.stopWebDaemon()
 	w.stopLoginWebDaemon()
 }

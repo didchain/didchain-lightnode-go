@@ -30,8 +30,8 @@ func NewNode(cfg *config.NodeConfig) *LightNode {
 
 	node := &LightNode{
 		conf: cfg,
-		worker: &Worker{port: cfg.ListenPort,loginwebport: cfg.LoginPort,storage: storage.NewStorage(db),
-			admin: config.LoadAdminUser(cfg.AdminUserDb),cfg: cfg,sessionStorage: loginUam.NewSessStorage(cfg)},
+		worker: &Worker{port: cfg.ListenPort, loginwebport: cfg.LoginPort, storage: storage.NewStorage(db),
+			admin: config.LoadAdminUser(cfg.AdminUserDb), cfg: cfg, sessionStorage: loginUam.NewSessStorage(cfg)},
 	}
 
 	return node

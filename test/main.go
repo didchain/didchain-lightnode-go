@@ -106,28 +106,28 @@ func main() {
 	//
 	//fmt.Println(string(j))
 	//
-	uamwalletPathh:="./uamwallet"
+	uamwalletPathh := "./uamwallet"
 	//
 	var wl account.Wallet
-	if ok:=tools.FileExists(uamwalletPathh);!ok{
-		wl,_=account.NewWallet("123")
+	if ok := tools.FileExists(uamwalletPathh); !ok {
+		wl, _ = account.NewWallet("123")
 		wl.SaveToPath(uamwalletPathh)
-	}else{
-		wl,_=account.LoadWallet(uamwalletPathh)
+	} else {
+		wl, _ = account.LoadWallet(uamwalletPathh)
 		wl.Open("123")
 	}
 
-	if len(os.Args)>1{
-		randbytes:=os.Args[1]
+	if len(os.Args) > 1 {
+		randbytes := os.Args[1]
 
 		fmt.Println(randbytes)
-		verifyuam2(wl,randbytes)
+		verifyuam2(wl, randbytes)
 		return
 	}
 
-	ac,_:=gettoken()
+	ac, _ := gettoken()
 
-	verifyuam(wl,ac)
+	verifyuam(wl, ac)
 
 	checkAc(ac)
 
@@ -165,17 +165,17 @@ func main() {
 
 }
 
-func verifyuam2(w account.Wallet, ac string)  {
-	content:=&protocol.UAMSignatureContent{
-		AuthUrl: "http://39.99.198.143:60998/verify",
+func verifyuam2(w account.Wallet, ac string) {
+	content := &protocol.UAMSignatureContent{
+		AuthUrl:     "http://39.99.198.143:60998/verify",
 		RandomToken: ac,
-		DID: w.Did().String(),
+		DID:         w.Did().String(),
 	}
 
-	sigbytes:=w.SignJson(content)
+	sigbytes := w.SignJson(content)
 
-	sig:=&protocol.UAMSignature{
-		Content: content,
+	sig := &protocol.UAMSignature{
+		Content:   content,
 		Signature: base58.Encode(sigbytes),
 	}
 
@@ -195,18 +195,17 @@ func verifyuam2(w account.Wallet, ac string)  {
 
 }
 
-
-func verifyuam(w account.Wallet, ac *protocol.AuthContent)  {
-	content:=&protocol.UAMSignatureContent{
-		AuthUrl: ac.AuthUrl,
+func verifyuam(w account.Wallet, ac *protocol.AuthContent) {
+	content := &protocol.UAMSignatureContent{
+		AuthUrl:     ac.AuthUrl,
 		RandomToken: ac.RandomToken,
-		DID: w.Did().String(),
+		DID:         w.Did().String(),
 	}
 
-	sigbytes:=w.SignJson(content)
+	sigbytes := w.SignJson(content)
 
-	sig:=&protocol.UAMSignature{
-		Content: content,
+	sig := &protocol.UAMSignature{
+		Content:   content,
 		Signature: base58.Encode(sigbytes),
 	}
 
@@ -220,30 +219,29 @@ func verifyuam(w account.Wallet, ac *protocol.AuthContent)  {
 		return
 	}
 
-	uamr:=&protocol.UAMResponse{}
-	json.Unmarshal([]byte(resp),uamr)
+	uamr := &protocol.UAMResponse{}
+	json.Unmarshal([]byte(resp), uamr)
 	fmt.Println(resp)
 
 }
 
-func checkAc(ac *protocol.AuthContent)  {
+func checkAc(ac *protocol.AuthContent) {
 	url := "http://39.99.198.143:60998/api/check"
-	j,_:=json.Marshal(*ac)
+	j, _ := json.Marshal(*ac)
 	resp, _, err := httputil.Post(url, string(j), false)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	uc:=&protocol.UAMCheck{}
+	uc := &protocol.UAMCheck{}
 
 	uamr := &protocol.UAMResponse{Data: uc}
 
-	json.Unmarshal([]byte(resp),uamr)
+	json.Unmarshal([]byte(resp), uamr)
 
-	if uc.UserDesc != nil{
+	if uc.UserDesc != nil {
 		fmt.Println(uc.UserDesc.Name)
 	}
-
 
 }
 
@@ -521,12 +519,10 @@ func gettoken() (*protocol.AuthContent, error) {
 		return nil, e
 	}
 
-
 	fmt.Println(string(r))
-	ac:=&protocol.AuthContent{}
+	ac := &protocol.AuthContent{}
 
-	json.Unmarshal(r,ac)
-
+	json.Unmarshal(r, ac)
 
 	return ac, nil
 }
