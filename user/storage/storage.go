@@ -1,12 +1,14 @@
 package storage
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"github.com/btcsuite/goleveldb/leveldb"
 	"github.com/btcsuite/goleveldb/leveldb/opt"
 	"github.com/btcsuite/goleveldb/leveldb/util"
 	"github.com/didchain/didCard-go/account"
+	"strings"
 	"sync"
 )
 
@@ -15,6 +17,13 @@ const (
 	UserListBegin string = "didchain_user_did"
 	UserListEnd   string = "didchain_user_didzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
 )
+
+const(
+	hostHead string = "didchain_host_%s"
+	hostPatternBegin string = "didchain_host_"
+	hostPatternEnd string = "didchain_host_~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+)
+
 
 type Storage struct {
 	lock sync.RWMutex
@@ -167,4 +176,60 @@ func (s *Storage) ListAllValue2(convert func(data []byte) interface{}, begin, co
 	}
 
 	return vs
+}
+
+func (s *Storage)AddHost(host string) error  {
+	bas64host := base64.StdEncoding.EncodeToString([]byte(host))
+
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
+	key:=fmt.Sprintf(hostHead,bas64host)
+	wo:=&opt.WriteOptions{
+		Sync: true,
+	}
+	//log.Println(key)
+	return s.db.Put([]byte(key),[]byte("v"),wo)
+}
+
+func (s *Storage)DelHost(host string)   {
+	bas64host := base64.StdEncoding.EncodeToString([]byte(host))
+
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
+	key:=fmt.Sprintf(hostHead,bas64host)
+	wo:=&opt.WriteOptions{
+		Sync: true,
+	}
+
+	s.db.Delete([]byte(key),wo)
+}
+
+func (s *Storage)ListAllHost() ([]string)  {
+	s.lock.RLock()
+	defer s.lock.RUnlock()
+
+	var host []string
+
+	r := &util.Range{Start: []byte(hostPatternBegin), Limit: []byte(hostPatternEnd)}
+	iter := s.db.NewIterator(r, nil)
+	defer iter.Release()
+
+	for iter.Next() {
+		//log.Println("key is",string(iter.Key()))
+		ks:=strings.Split(string(iter.Key()),"_")
+		if len(ks) != 3{
+			continue
+		}
+
+		base64host:=ks[2]
+		//log.Println("base64host is",base64host)
+		h,_:=base64.StdEncoding.DecodeString(base64host)
+		//log.Println("host is",h)
+		host = append(host,string(h))
+	}
+
+	return host
+
 }

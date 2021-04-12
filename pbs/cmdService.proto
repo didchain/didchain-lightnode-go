@@ -6,12 +6,17 @@ option go_package = ".;pbs";
 service CmdService {
     rpc ShowAllAdminUser (EmptyRequest) returns (CommonResponse) {}
     rpc ChgUser (AccessAddress) returns (CommonResponse) {}
+    rpc ShowAllHost (EmptyRequest) returns (CommonResponse) {}
+    rpc DelHost (HostRequest) returns (CommonResponse) {}
 }
 
 message EmptyRequest {
 
 }
 
+message HostRequest {
+    string host = 1;
+}
 
 
 message CommonResponse {

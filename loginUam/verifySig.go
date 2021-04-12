@@ -29,10 +29,19 @@ func NewUamAPI(us *storage.Storage, ss *SessStorage, cfg *config.NodeConfig) *Ua
 }
 
 func (ua *UamAPI) Auth(w http.ResponseWriter, r *http.Request) {
+	url:=ua.cfg.LoginUrl
+
+	q:=r.URL.Query()
+	hs,ok := q["hostname"]
+	if ok && len(hs)>0{
+		url = hs[0]
+		ua.userStorage.AddHost(url)
+	}
+
 	id := ua.sessStorage.NewSession()
 
 	token := &protocol.AuthContent{
-		AuthUrl:     ua.cfg.LoginUrl,
+		AuthUrl:     url,
 		RandomToken: base58.Encode(id[:]),
 	}
 
@@ -104,9 +113,9 @@ func (ua *UamAPI) Verify(w http.ResponseWriter, r *http.Request) {
 	var udstr string
 
 	if udstr = ua.userStorage.FindUser(sig.Content.DID); udstr == "" {
-		userNotFound(w)
+		//userNotFound(w)
 		webapi.Glist4add.Add(sig.Content.DID, tools.GetNowMsTime())
-		return
+		//return
 	}
 
 	id := Str2SessID(sig.Content.RandomToken)
@@ -152,7 +161,7 @@ func (ua *UamAPI) Check(w http.ResponseWriter, r *http.Request) {
 	id := Str2SessID(sig.RandomToken)
 	var v interface{}
 	if v = ua.sessStorage.FindSession(id); v == nil {
-		sigNotCorrect(w)
+		userNotFound(w)
 		return
 	}
 
@@ -261,4 +270,23 @@ func (ua *UamAPI) Logout(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
 	j, _ := json.Marshal(*resp)
 	w.Write(j)
+}
+
+func (ua *UamAPI)ListHost(w http.ResponseWriter, r *http.Request)  {
+	if r.Method != "GET" {
+		internalErr(w)
+		return
+	}
+	resp := &protocol.UAMResponse{
+		Message: protocol.SuccessMsg,
+	}
+
+	hosts:=ua.userStorage.ListAllHost()
+
+	resp.Data = hosts
+
+	w.WriteHeader(200)
+	j, _ := json.Marshal(*resp)
+	w.Write(j)
+
 }

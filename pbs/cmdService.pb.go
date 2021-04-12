@@ -67,6 +67,53 @@ func (*EmptyRequest) Descriptor() ([]byte, []int) {
 	return file_cmdService_proto_rawDescGZIP(), []int{0}
 }
 
+type HostRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Host string `protobuf:"bytes,1,opt,name=host,proto3" json:"host,omitempty"`
+}
+
+func (x *HostRequest) Reset() {
+	*x = HostRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_cmdService_proto_msgTypes[1]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *HostRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*HostRequest) ProtoMessage() {}
+
+func (x *HostRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_cmdService_proto_msgTypes[1]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use HostRequest.ProtoReflect.Descriptor instead.
+func (*HostRequest) Descriptor() ([]byte, []int) {
+	return file_cmdService_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *HostRequest) GetHost() string {
+	if x != nil {
+		return x.Host
+	}
+	return ""
+}
+
 type CommonResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -78,7 +125,7 @@ type CommonResponse struct {
 func (x *CommonResponse) Reset() {
 	*x = CommonResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_cmdService_proto_msgTypes[1]
+		mi := &file_cmdService_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -91,7 +138,7 @@ func (x *CommonResponse) String() string {
 func (*CommonResponse) ProtoMessage() {}
 
 func (x *CommonResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cmdService_proto_msgTypes[1]
+	mi := &file_cmdService_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -104,7 +151,7 @@ func (x *CommonResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CommonResponse.ProtoReflect.Descriptor instead.
 func (*CommonResponse) Descriptor() ([]byte, []int) {
-	return file_cmdService_proto_rawDescGZIP(), []int{1}
+	return file_cmdService_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *CommonResponse) GetMsg() string {
@@ -126,7 +173,7 @@ type AccessAddress struct {
 func (x *AccessAddress) Reset() {
 	*x = AccessAddress{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_cmdService_proto_msgTypes[2]
+		mi := &file_cmdService_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -139,7 +186,7 @@ func (x *AccessAddress) String() string {
 func (*AccessAddress) ProtoMessage() {}
 
 func (x *AccessAddress) ProtoReflect() protoreflect.Message {
-	mi := &file_cmdService_proto_msgTypes[2]
+	mi := &file_cmdService_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -152,7 +199,7 @@ func (x *AccessAddress) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AccessAddress.ProtoReflect.Descriptor instead.
 func (*AccessAddress) Descriptor() ([]byte, []int) {
-	return file_cmdService_proto_rawDescGZIP(), []int{2}
+	return file_cmdService_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *AccessAddress) GetAdddr() string {
@@ -174,19 +221,28 @@ var File_cmdService_proto protoreflect.FileDescriptor
 var file_cmdService_proto_rawDesc = []byte{
 	0x0a, 0x10, 0x63, 0x6d, 0x64, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x70, 0x72, 0x6f,
 	0x74, 0x6f, 0x12, 0x03, 0x70, 0x62, 0x73, 0x22, 0x0e, 0x0a, 0x0c, 0x45, 0x6d, 0x70, 0x74, 0x79,
-	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x22, 0x0a, 0x0e, 0x43, 0x6f, 0x6d, 0x6d, 0x6f,
-	0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x10, 0x0a, 0x03, 0x6d, 0x73, 0x67,
-	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6d, 0x73, 0x67, 0x22, 0x35, 0x0a, 0x0d, 0x41,
-	0x63, 0x63, 0x65, 0x73, 0x73, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x12, 0x14, 0x0a, 0x05,
-	0x41, 0x64, 0x64, 0x64, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x41, 0x64, 0x64,
-	0x64, 0x72, 0x12, 0x0e, 0x0a, 0x02, 0x6f, 0x70, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x02,
-	0x6f, 0x70, 0x32, 0x80, 0x01, 0x0a, 0x0a, 0x43, 0x6d, 0x64, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63,
-	0x65, 0x12, 0x3c, 0x0a, 0x10, 0x53, 0x68, 0x6f, 0x77, 0x41, 0x6c, 0x6c, 0x41, 0x64, 0x6d, 0x69,
-	0x6e, 0x55, 0x73, 0x65, 0x72, 0x12, 0x11, 0x2e, 0x70, 0x62, 0x73, 0x2e, 0x45, 0x6d, 0x70, 0x74,
-	0x79, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x13, 0x2e, 0x70, 0x62, 0x73, 0x2e, 0x43,
-	0x6f, 0x6d, 0x6d, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12,
-	0x34, 0x0a, 0x07, 0x43, 0x68, 0x67, 0x55, 0x73, 0x65, 0x72, 0x12, 0x12, 0x2e, 0x70, 0x62, 0x73,
-	0x2e, 0x41, 0x63, 0x63, 0x65, 0x73, 0x73, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x1a, 0x13,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x21, 0x0a, 0x0b, 0x48, 0x6f, 0x73, 0x74, 0x52,
+	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x68, 0x6f, 0x73, 0x74, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x68, 0x6f, 0x73, 0x74, 0x22, 0x22, 0x0a, 0x0e, 0x43, 0x6f,
+	0x6d, 0x6d, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x10, 0x0a, 0x03,
+	0x6d, 0x73, 0x67, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6d, 0x73, 0x67, 0x22, 0x35,
+	0x0a, 0x0d, 0x41, 0x63, 0x63, 0x65, 0x73, 0x73, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x12,
+	0x14, 0x0a, 0x05, 0x41, 0x64, 0x64, 0x64, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05,
+	0x41, 0x64, 0x64, 0x64, 0x72, 0x12, 0x0e, 0x0a, 0x02, 0x6f, 0x70, 0x18, 0x02, 0x20, 0x01, 0x28,
+	0x05, 0x52, 0x02, 0x6f, 0x70, 0x32, 0xed, 0x01, 0x0a, 0x0a, 0x43, 0x6d, 0x64, 0x53, 0x65, 0x72,
+	0x76, 0x69, 0x63, 0x65, 0x12, 0x3c, 0x0a, 0x10, 0x53, 0x68, 0x6f, 0x77, 0x41, 0x6c, 0x6c, 0x41,
+	0x64, 0x6d, 0x69, 0x6e, 0x55, 0x73, 0x65, 0x72, 0x12, 0x11, 0x2e, 0x70, 0x62, 0x73, 0x2e, 0x45,
+	0x6d, 0x70, 0x74, 0x79, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x13, 0x2e, 0x70, 0x62,
+	0x73, 0x2e, 0x43, 0x6f, 0x6d, 0x6d, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x22, 0x00, 0x12, 0x34, 0x0a, 0x07, 0x43, 0x68, 0x67, 0x55, 0x73, 0x65, 0x72, 0x12, 0x12, 0x2e,
+	0x70, 0x62, 0x73, 0x2e, 0x41, 0x63, 0x63, 0x65, 0x73, 0x73, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73,
+	0x73, 0x1a, 0x13, 0x2e, 0x70, 0x62, 0x73, 0x2e, 0x43, 0x6f, 0x6d, 0x6d, 0x6f, 0x6e, 0x52, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x37, 0x0a, 0x0b, 0x53, 0x68, 0x6f, 0x77,
+	0x41, 0x6c, 0x6c, 0x48, 0x6f, 0x73, 0x74, 0x12, 0x11, 0x2e, 0x70, 0x62, 0x73, 0x2e, 0x45, 0x6d,
+	0x70, 0x74, 0x79, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x13, 0x2e, 0x70, 0x62, 0x73,
+	0x2e, 0x43, 0x6f, 0x6d, 0x6d, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22,
+	0x00, 0x12, 0x32, 0x0a, 0x07, 0x44, 0x65, 0x6c, 0x48, 0x6f, 0x73, 0x74, 0x12, 0x10, 0x2e, 0x70,
+	0x62, 0x73, 0x2e, 0x48, 0x6f, 0x73, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x13,
 	0x2e, 0x70, 0x62, 0x73, 0x2e, 0x43, 0x6f, 0x6d, 0x6d, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f,
 	0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x07, 0x5a, 0x05, 0x2e, 0x3b, 0x70, 0x62, 0x73, 0x62, 0x06,
 	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
@@ -204,19 +260,24 @@ func file_cmdService_proto_rawDescGZIP() []byte {
 	return file_cmdService_proto_rawDescData
 }
 
-var file_cmdService_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_cmdService_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_cmdService_proto_goTypes = []interface{}{
 	(*EmptyRequest)(nil),   // 0: pbs.EmptyRequest
-	(*CommonResponse)(nil), // 1: pbs.CommonResponse
-	(*AccessAddress)(nil),  // 2: pbs.AccessAddress
+	(*HostRequest)(nil),    // 1: pbs.HostRequest
+	(*CommonResponse)(nil), // 2: pbs.CommonResponse
+	(*AccessAddress)(nil),  // 3: pbs.AccessAddress
 }
 var file_cmdService_proto_depIdxs = []int32{
 	0, // 0: pbs.CmdService.ShowAllAdminUser:input_type -> pbs.EmptyRequest
-	2, // 1: pbs.CmdService.ChgUser:input_type -> pbs.AccessAddress
-	1, // 2: pbs.CmdService.ShowAllAdminUser:output_type -> pbs.CommonResponse
-	1, // 3: pbs.CmdService.ChgUser:output_type -> pbs.CommonResponse
-	2, // [2:4] is the sub-list for method output_type
-	0, // [0:2] is the sub-list for method input_type
+	3, // 1: pbs.CmdService.ChgUser:input_type -> pbs.AccessAddress
+	0, // 2: pbs.CmdService.ShowAllHost:input_type -> pbs.EmptyRequest
+	1, // 3: pbs.CmdService.DelHost:input_type -> pbs.HostRequest
+	2, // 4: pbs.CmdService.ShowAllAdminUser:output_type -> pbs.CommonResponse
+	2, // 5: pbs.CmdService.ChgUser:output_type -> pbs.CommonResponse
+	2, // 6: pbs.CmdService.ShowAllHost:output_type -> pbs.CommonResponse
+	2, // 7: pbs.CmdService.DelHost:output_type -> pbs.CommonResponse
+	4, // [4:8] is the sub-list for method output_type
+	0, // [0:4] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -241,7 +302,7 @@ func file_cmdService_proto_init() {
 			}
 		}
 		file_cmdService_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*CommonResponse); i {
+			switch v := v.(*HostRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -253,6 +314,18 @@ func file_cmdService_proto_init() {
 			}
 		}
 		file_cmdService_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CommonResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_cmdService_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*AccessAddress); i {
 			case 0:
 				return &v.state
@@ -271,7 +344,7 @@ func file_cmdService_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_cmdService_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
@@ -299,6 +372,8 @@ const _ = grpc.SupportPackageIsVersion6
 type CmdServiceClient interface {
 	ShowAllAdminUser(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*CommonResponse, error)
 	ChgUser(ctx context.Context, in *AccessAddress, opts ...grpc.CallOption) (*CommonResponse, error)
+	ShowAllHost(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*CommonResponse, error)
+	DelHost(ctx context.Context, in *HostRequest, opts ...grpc.CallOption) (*CommonResponse, error)
 }
 
 type cmdServiceClient struct {
@@ -327,10 +402,30 @@ func (c *cmdServiceClient) ChgUser(ctx context.Context, in *AccessAddress, opts 
 	return out, nil
 }
 
+func (c *cmdServiceClient) ShowAllHost(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*CommonResponse, error) {
+	out := new(CommonResponse)
+	err := c.cc.Invoke(ctx, "/pbs.CmdService/ShowAllHost", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *cmdServiceClient) DelHost(ctx context.Context, in *HostRequest, opts ...grpc.CallOption) (*CommonResponse, error) {
+	out := new(CommonResponse)
+	err := c.cc.Invoke(ctx, "/pbs.CmdService/DelHost", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CmdServiceServer is the server API for CmdService service.
 type CmdServiceServer interface {
 	ShowAllAdminUser(context.Context, *EmptyRequest) (*CommonResponse, error)
 	ChgUser(context.Context, *AccessAddress) (*CommonResponse, error)
+	ShowAllHost(context.Context, *EmptyRequest) (*CommonResponse, error)
+	DelHost(context.Context, *HostRequest) (*CommonResponse, error)
 }
 
 // UnimplementedCmdServiceServer can be embedded to have forward compatible implementations.
@@ -342,6 +437,12 @@ func (*UnimplementedCmdServiceServer) ShowAllAdminUser(context.Context, *EmptyRe
 }
 func (*UnimplementedCmdServiceServer) ChgUser(context.Context, *AccessAddress) (*CommonResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ChgUser not implemented")
+}
+func (*UnimplementedCmdServiceServer) ShowAllHost(context.Context, *EmptyRequest) (*CommonResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ShowAllHost not implemented")
+}
+func (*UnimplementedCmdServiceServer) DelHost(context.Context, *HostRequest) (*CommonResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DelHost not implemented")
 }
 
 func RegisterCmdServiceServer(s *grpc.Server, srv CmdServiceServer) {
@@ -384,6 +485,42 @@ func _CmdService_ChgUser_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CmdService_ShowAllHost_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EmptyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CmdServiceServer).ShowAllHost(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pbs.CmdService/ShowAllHost",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CmdServiceServer).ShowAllHost(ctx, req.(*EmptyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CmdService_DelHost_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(HostRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CmdServiceServer).DelHost(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pbs.CmdService/DelHost",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CmdServiceServer).DelHost(ctx, req.(*HostRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _CmdService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "pbs.CmdService",
 	HandlerType: (*CmdServiceServer)(nil),
@@ -395,6 +532,14 @@ var _CmdService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ChgUser",
 			Handler:    _CmdService_ChgUser_Handler,
+		},
+		{
+			MethodName: "ShowAllHost",
+			Handler:    _CmdService_ShowAllHost_Handler,
+		},
+		{
+			MethodName: "DelHost",
+			Handler:    _CmdService_DelHost_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

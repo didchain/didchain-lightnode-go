@@ -8,11 +8,23 @@ import (
 	"github.com/didchain/didchain-lightnode-go/loginUam"
 	"github.com/didchain/didchain-lightnode-go/user/storage"
 	"log"
+	"sync"
 )
 
 type LightNode struct {
 	conf   *config.NodeConfig
 	worker *Worker
+}
+
+var LightNodeInstance *LightNode
+var oncedo sync.Once
+
+func NodeInstance(cfg *config.NodeConfig) *LightNode {
+	oncedo.Do(func() {
+		LightNodeInstance = NewNode(cfg)
+	})
+
+	return LightNodeInstance
 }
 
 func NewNode(cfg *config.NodeConfig) *LightNode {
@@ -35,6 +47,10 @@ func NewNode(cfg *config.NodeConfig) *LightNode {
 	}
 
 	return node
+}
+
+func (sn *LightNode)GetUserStorage() *storage.Storage  {
+	return sn.worker.storage
 }
 
 func (sn *LightNode) Start() {

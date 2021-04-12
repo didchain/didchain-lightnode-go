@@ -42,11 +42,12 @@ func mainRun(_ *cobra.Command, _ []string) {
 
 	cfg := config.InitNodeConf()
 
-	node := node.NewNode(cfg)
+	node := node.NodeInstance(cfg)
 
 	go cmd.StartCmdService()
 
 	node.Start()
+
 
 	signal.Notify(stop,
 		syscall.SIGKILL,
@@ -60,11 +61,13 @@ func mainRun(_ *cobra.Command, _ []string) {
 
 	node.Stop()
 
+
 }
 
 func init() {
 	rootCmd.Flags().BoolVarP(&param.version, "version", "v", false, "node version")
 	rootCmd.AddCommand(cmd.AdminUserCmd)
+	rootCmd.AddCommand(cmd.HostCmd)
 	//rootCmd.Flags().StringVarP(&param.did, "did",
 	//	"d", "", "admin user")
 

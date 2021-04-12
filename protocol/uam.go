@@ -11,8 +11,14 @@ type UAMSignatureContent struct {
 	DID         string `json:"did"`
 }
 
+type UAMExtData struct {
+	UserName string `json:"user_name"`
+	Password string `json:"password"`
+}
+
 type UAMSignature struct {
 	Content   *UAMSignatureContent `json:"content"`
+	ExtData   *UAMExtData          `json:"ext_data"`
 	Signature string               `json:"sig"`
 }
 

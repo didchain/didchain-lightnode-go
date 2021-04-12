@@ -67,6 +67,7 @@ func (w *Worker) StartLoginWebDaemon() {
 	mux.HandleFunc("/api/check", uamapi.Check)
 	mux.HandleFunc("/api/checkLogin", uamapi.CheckLogin)
 	mux.HandleFunc("/api/logout", uamapi.Logout)
+	mux.HandleFunc("/api/hostList",uamapi.ListHost)
 
 	wfs := assetfs.AssetFS{Asset: uamfs.Asset, AssetDir: uamfs.AssetDir, AssetInfo: uamfs.AssetInfo, Prefix: "webpages/html/dist2"}
 
